@@ -1,0 +1,57 @@
+---
+layout: default
+---
+
+<div class="home">
+  <div class="main-content">
+    {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+    {%- endif -%}
+
+    {{ content }}
+
+    {%- if site.posts.size > 0 -%}
+    <div class="post-list-header">
+      <h2 class="post-list-heading">{{ page.list_title | default: "Posts" }}</h2>
+      <h3 class=="post-list-feed">(<a href="{{ "/feed.xml" | relative_url }}">RSS</a>)</h3>
+    </div>
+    <ul class="post-list">
+      {%- for post in site.posts -%}
+      <li>
+        {%- if post.authors -%}
+        {% assign author_name = post.author %}
+        {%- else if post.author -%}
+        {% assign author = site.data.authors[post.author] %}
+        {% assign author_name = author.name %}
+        {%- if author.username  -%}
+        <a class=post-author" href="//github.com/{{ author.username }}">
+        {% avatar user=author.username size=80 %}
+        </a>
+        {%- endif -%}
+        {%- endif -%}
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        <h3>
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h3>
+        <div class="post-meta">
+          {{ post.date | date: date_format }} | {{ author_name }} |
+          {% for tag in post.tags %}
+           {% capture tag_name %}{{ tag }}{% endcapture %}
+           <a href="/tag/{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code>&nbsp;</a>
+           {% endfor %}
+        </div>
+        {%- if site.show_excerpts -%}
+        <div class="post-excerpt">{{ post.excerpt }}</div>
+        {%- endif -%}
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- endif -%}
+  </div>
+  <div class="right-panel">
+    {%- include tag-cloud.html -%}
+  </div>
+</div>

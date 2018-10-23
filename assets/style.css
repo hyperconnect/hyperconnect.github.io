@@ -1,0 +1,137 @@
+@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
+
+.post-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 6px;
+}
+.post-meta {
+    color: #777;
+    margin-bottom: 20px;
+}
+.post-meta > time {
+    padding-right: 4px;
+}
+.post-meta > span {
+    padding-left: 4px;
+}
+.post-header {
+    margin-top: 50px;
+}
+.post-header:before {
+    display: block;
+    width: 54px;
+    height: 5px;
+    background: #222;
+    top: -24px;
+    content: ' ';
+    position: relative;
+}
+.site-title span {
+    font-size: 20px;
+    font-weight: 500;
+}
+.site-title img {
+    height: 20px;
+    width: auto;
+    padding-right: 6px;
+}
+.post-list-header > * {
+    display:inline;
+}
+.post-list li {
+    margin: 0px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #cccccc;
+}
+.post-list .avatar {
+    float: right;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+.post .avatar {
+    border-radius: 50%;
+    margin-left: 10px;
+}
+.post-content h1 {
+    font-size: 30px;
+    font-weight: 600;
+    margin-top: 50px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #eaecef;
+}
+.post-content h2 {
+    font-size: 26px;
+    font-weight: 400;
+    margin-top: 50px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #eaecef;
+}
+.post-content h3 {
+    font-size: 22px;
+    margin-top: 30px;
+    font-weight: 400;
+}
+ul, ol {
+    padding-bottom: 10px;
+}
+li {
+    margin-bottom: 10px;
+}
+p, li {
+    font-family: 'Spoqa Han Sans', 'Sans-serif';
+    word-wrap: break-word;
+    font-size: 16px;
+    line-height: 30px;
+    color: #444;
+    font-weight: 300;
+}
+blockquote > p {
+    color: #999;
+    font-style: normal;
+    letter-spacing: 0;
+}
+a:link, a:visited, a:hover, a:active {
+    text-decoration: none;
+}
+a:hover {
+    color: #2a7ae2;
+}
+pre, .highlighter-rouge pre.highlight {
+    background: #f6f8fa;
+    padding: 12px 16px;
+}
+pre.highlight > code {
+    border: 0;
+}
+code {
+    background-color: #f6f8fa;
+    padding: 1px 7px;
+}
+pre, code {
+    font-size: 14px;
+}
+
+.home {
+    display: flex;
+}
+
+.main-content {
+    flex: 4;
+}
+
+.right-panel {
+    flex: 1;
+    margin-left: 10%;
+}
+
+@media (max-width: 768px) {
+    .home {
+        display: block;
+    }
+    .right-panel {
+        margin: 0;
+    }
+}
