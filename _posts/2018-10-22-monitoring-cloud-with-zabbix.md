@@ -90,7 +90,8 @@ Hyperconnect에서는 아래 기준에 맞추어 인프라를 분류하고 있�
   * Service 안에서 역할 분류 (e.g: worker, web, was)
 * `Region`
   * 인프라가 서비스되는 지역
-Naming Convention Rule을 기반으로 Zabbix 상의 Hostgroup, Host, Template의 이름을 설계하는 것을 권장합니다.
+
+예시와 같은 Naming Convention Rule을 기반으로 Zabbix 상의 Hostgroup, Host, Template의 이름을 설계하는 것을 권장합니다.
 
 ## Zabbix Linked Template 활용
 Zabbix는 Template이라는 편리한 기능을 통해, Template에 Item과 Trigger를 정의 해놓고 모니터링 Host에 이를 Link하여 사용하게 되며, 아래 그림과 같은 구조를 갖습니다.
@@ -172,7 +173,7 @@ res = self._zapi.host.create(
 Cloud 환경에서는 Agent의 Auto Registration 기능으로 등록 할 수 없는 ELB, RDS, ElastiCache 등 AWS Managed Resource들이 있습니다.
 또한, `Instance Status` (Stop, Termination, Replace 등)의 변화가 생길 수 있습니다.
 이러한 인프라 변화에도 대응하기 위해 ZabbixAPI와 Boto3를 통해 자동화된 Zabbix 설정을 구현하여 사용 중 입니다.
-결과적으로, AWS상에서 생성, 삭제, 교체되는 모든 인프라 자원들은 Zabbix에 자동으로 Update 됩니다.
+결과적으로, AWS상에서 `생성`, `삭제`, `교체`되는 모든 인프라 자원들은 Zabbix에 자동으로 Update 됩니다.
 
 ## Item Metric Auto Discovery: [Zabbix Custom LLD](https://www.zabbix.com/documentation/3.4/manual/discovery/low_level_discovery) 활용
 Host 뿐만 아니라 Host내부의 Item metric들도 가변적인 요소들이 있습니다. 이러한 경우에 가변적인 Item metric을 Discovery하여 자동으로 Host Item에 등록하게 해주는 기능이 LLD(Low Level Discovery) 입니다.
@@ -216,7 +217,7 @@ printf "]}"
 
 ## Cloudwatch + Lambda + ZabbixAPI의 사용
 
-단순 Auto Discovery 기능을 넘어, 좀 더 복잡한 상황에서 AWS에서 발생하는 Event와 Zabbix 연동 간 Event Driven 방식 처리가 필요한 경우도 있습니다. 이럴 때는 ``Cloudwatch Event -> Lambda -> ZabbixAPI`` 연동 Pipeine을 구성하여 복잡한 모니터링 설정 변경 대응이 가능합니다.
+단순 Auto Discovery 기능을 넘어, 좀 더 복잡한 상황에서 AWS에서 발생하는 Event와 Zabbix 연동 간 Event Driven 방식 처리가 필요한 경우도 있습니다. 이럴 때는 ``Cloudwatch Event -> Lambda -> ZabbixAPI`` 연동 Pipeline을 구성하여 복잡한 모니터링 설정 변경 대응이 가능합니다.
 
 
 ## 마치며
