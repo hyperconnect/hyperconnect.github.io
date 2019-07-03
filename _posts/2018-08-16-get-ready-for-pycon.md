@@ -6,7 +6,7 @@ author: dgoon
 published: true
 lang: ko
 excerpt: 하이퍼커넥트가 파이콘 한국 2018과 함께합니다
-tags: pycon.kr python coding-battle
+tags: pycon.kr python coding-battle conference
 ---
 드디어 [파이콘 한국 2018](https://www.pycon.kr/2018/)이 눈앞에 다가왔습니다! 파이콘은 파이썬 개발자들이 만나 지식을 공유하고 만남을 갖기 위한 장입니다. 올해로 5회째를 맞이한 한국 행사는 8월 15일 스프린트를 시작으로 8월 19일까지 코엑스에서 진행됩니다.  
 
