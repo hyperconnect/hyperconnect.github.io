@@ -1,7 +1,7 @@
 ---
 layout: post
 date: 2019-10-25
-title: 앱내 Webview 개발기
+title: 앱 내 Webview 개발기
 author: hannah
 tags: webview react django webpack next.js react-native
 excerpt: Azar Webview를 리팩토링하며 배운 점
@@ -42,7 +42,7 @@ module.exports = {
 
 ```html
 <!-- templates/item_inventory/index.html -->
-<script type="text/javascript" src="{% static 'item_inventory/js/main.js' %}">
+<script type="text/javascript" src="{% raw %}{% static 'item_inventory/js/main.js' %}{% endraw %}">
 ```
 
 이러한 방식의 문제점은 webpack에서 Hot Module Relaod(HMR) 설정을 하더라도 결국 Django에서 서빙하는 html 파일을 보면서 개발을 해야하기 때문에 변경사항을 반영할 때 새로고침을 해주어야 한다는 점입니다.
