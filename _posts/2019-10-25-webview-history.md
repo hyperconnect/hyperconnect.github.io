@@ -3,7 +3,7 @@ layout: post
 date: 2019-10-25
 title: 앱 내 Webview 개발기
 author: hannah
-tags: webview react django webpack next.js react-native
+tags: webview react django webpack next.js
 excerpt: Azar Webview를 리팩토링하며 배운 점
 last_modified_at: 2019-10-25
 ---
@@ -160,10 +160,6 @@ Stackdriver 에서는 로그를 한눈에 볼 수 있는 대시보드 기능도 
 ### 배포
 
 배포 방식도 Docker 를 사용하도록 크게 변경되었습니다. backend(python), frontend(node), nginx 의 도커 이미지를 각각 빌드하고 AWS ECR을 저장소로 사용하였습니다. 등록된 이미지로부터 ECS를 사용하여 컨테이너 오케스트레이션을 구성하였고 CodeDeploy로 자동화를 구축함으로써 더욱 유연하고 간편한 배포 프로세스를 마련하였습니다. 또한 CloudWatch로 메모리와 CPU 사용 현황을 확인합니다.
-
-## 4. React Native
-
-아직 개발 중이지만 3번까지 개발된 웹뷰 중 일부를 React Native로 리팩토링 하고 있습니다. 네이티브 수준의 사용자 경험을 제공함과 동시에 스토어 리뷰를 거치지 않고 빠르게 배포하기 위함입니다.
 
 ## 마무리
 
