@@ -5,7 +5,7 @@ title: Azar Mirror 서버 제작기 2편 - Istio와 함께하는 Traffic Mirrori
 author: sammie
 tags: microservice istio mirror traffic virtualservice kubernetes
 excerpt: Mirror 서버로 traffic을 복제하고, microservice를 사용하는 요청을 routing하기 위해 Istio를 사용한 경험을 공유합니다.
-last_modified_at: 2020-06-02
+last_modified_at: 2020-06-11
 ---
 
 안녕하세요, DevOps 팀의 Sammie입니다. Mirror 서버를 만들기 위해 Istio[[1]](https://istio.io/)를 사용하여 traffic을 복제하고, routing 한 방법에 대해 좀 더 자세하게 공유해 드리려고 이 글을 작성했습니다 :)
@@ -53,7 +53,7 @@ Azar 서버는 microservice 구조로 되어 있어, **API 서버**는 일부 �
 
 # 1 - Istio Mirroring
 Istio의 traffic mirroring 기능[[3]](https://istio.io/docs/tasks/traffic-management/mirroring/)을 사용하면 설정 몇 줄로 모든 inbound traffic을 지정된 곳으로 mirroring 할 수 있습니다. 
-모든 **Test API 서버** traffic은 AWS ALB를 거쳐서 Istio ingressgateway로 들어오므로, 이 설정을 적용하게 되면 ingressgateway에서 요청을 복제하여 원래의 **Test API pod**과 **mirror API pod**에 동시에 전송합니다. Istio의 mirroring 요청은 fire & forget으로, **mirror API pod**에 보낸 요청의 timeout / 성공 실패 여부에 상관없이 사용자는 **Test API pod**의 응답만 받게 됩니다.
+모든 **test API 서버** traffic은 AWS ALB를 거쳐서 Istio ingressgateway로 들어오므로, 이 설정을 적용하게 되면 ingressgateway에서 요청을 복제하여 원래의 **test API pod**과 **mirror API pod**에 동시에 전송합니다. Istio의 mirroring 요청은 fire & forget으로, **mirror API pod**에 보낸 요청의 timeout / 성공 실패 여부에 상관없이 사용자는 **test API pod**의 응답만 받게 됩니다.
 
 아래 설정은 `azar` namespace에 있는 `api` service로 들어온 모든 http 요청을 `azar-mirror` namespace의 `api` service로 보내도록 합니다.
 ```yaml
@@ -76,12 +76,12 @@ spec:
 매우 간단하게 끝났습니다.
 
 
-# 2.A & 2.B - Istio Virual Service
+# 2.A & 2.B - Istio Virtual Service
 Istio의 virtual service는 mirroring이나 단순 routing 외에도 많은 일을 할 수 있습니다. `http[*].match[*].sourceLabels`를 사용하여 특정 label을 가지고 있는 pod에서 온 요청만 선택할 수 있습니다. 그리고 `http.headers.request.set`을 사용하여 request header에 특정 값을 추가 할 수도 있습니다.
 
-먼저, `azar` namespace에 있는 **Test API 서버**에는 `app=api, stack=test` label을, `azar-mirror` namespace에 있는 **mirror API 서버**에는 `app=api, stack=mirror` label을 붙였습니다. 그리고 `tiny-microservice`에 대한 VirtualService를 정의했습니다. 정의한 VirtualService는 3개의 route rule을 정의합니다.
+먼저, `azar` namespace에 있는 **test API 서버**에는 `app=api, stack=test` label을, `azar-mirror` namespace에 있는 **mirror API 서버**에는 `app=api, stack=mirror` label을 붙였습니다. 그리고 `tiny-microservice`에 대한 VirtualService를 정의했습니다. 정의한 VirtualService는 3개의 route rule을 정의합니다.
 - `app=api, stack=mirror` label을 가지고 있는 pod (**mirror API 서버**)에서 `tiny-microservice`를 호출한 경우 `X-Azar-Mirror: "true"` header를 붙여서 `mirror-cache`로 route
-- `app=api, stack=test` label을 가지고 있는 pod (**Test API 서버**)에서 `tiny-microservice`를 호출한 경우 `X-Azar-Mirror: "false"` header를 붙여서 `mirror-cache`로 route
+- `app=api, stack=test` label을 가지고 있는 pod (**test API 서버**)에서 `tiny-microservice`를 호출한 경우 `X-Azar-Mirror: "false"` header를 붙여서 `mirror-cache`로 route
 - 그 외의 모든 경우 `tiny-microservice`로 route
 
 ```yaml
@@ -126,7 +126,7 @@ spec:
 # 2.C - Istio Tracing
 **Test API 서버**의 코드와 **mirror API 서버**의 코드가 다를 수 있어 ***"동일한 요청"***인지 판별할 때 단순히 http method, url, header, body만 사용해서는 안 됩니다.
 
-다행히도, Istio는 Envoy의 Distributed Tracing 기능을 사용[[4]](https://istio.io/docs/tasks/observability/distributed-tracing/overview/)하고 있습니다. Istio mesh는 모든 http request header에 `x-request-id`가 존재하는지 확인하고, 없다면 UUID 값을 생성하여 추가합니다. 모든 microservice는 다른 microservice를 호출할 때 `x-request-id` 및 tracing에 필요한 다른 http headers를 전파해야 1번의 사용자 요청에 대해 1개의 올바른 trace를 얻을 수 있습니다. 또한, 원래의 **Test API 서버**로 들어오는 http request와 **mirror API 서버**로 들어오는 http request는 같은 `x-request-id`를 가지게 되므로, 이를 이용여 원본 요청과 복제된 요청의 쌍을 찾을 수 있습니다.
+다행히도, Istio는 Envoy의 Distributed Tracing 기능을 사용[[4]](https://istio.io/docs/tasks/observability/distributed-tracing/overview/)하고 있습니다. Istio mesh는 모든 http request header에 `x-request-id`가 존재하는지 확인하고, 없다면 UUID 값을 생성하여 추가합니다. 모든 microservice는 다른 microservice를 호출할 때 `x-request-id` 및 tracing에 필요한 다른 http headers를 전파해야 1번의 사용자 요청에 대해 1개의 올바른 trace를 얻을 수 있습니다. 또한, 원래의 **test API 서버**로 들어오는 http request와 **mirror API 서버**로 들어오는 http request는 같은 `x-request-id`를 가지게 되므로, 이를 이용여 원본 요청과 복제된 요청의 쌍을 찾을 수 있습니다.
 
 따라서, **API 서버**와 microservice에서 `x-request-id` 등 필요한 몇 가지 http headers를 전파해주기만 한다면 DevOps 팀의 작업 없이 동일한 API 요청으로 생성된 microservice http call을 식별 할 수 있습니다. 이제 앞 단락에서 주입했던 `x-azar-mirror`와 기본적으로 포함되는 `host` header를 살펴 `mirror-cache` microservice는 ***"동일한 요청"***을 식별할 수 있게 됩니다.
 
