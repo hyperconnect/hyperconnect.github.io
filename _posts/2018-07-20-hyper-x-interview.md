@@ -138,5 +138,5 @@ tags: hyper-x interview
 
 하이퍼X는 전직군 채용중입니다. 하이퍼X에서 문샷에 도전하고 싶은 분들은 지금 바로 하이퍼커넥트의 문을 두드려주세요!
 
-[채용 바로가기](https://hyperconnect.com/career/)
+[채용 바로가기](https://career.hyperconnect.com/)
 
