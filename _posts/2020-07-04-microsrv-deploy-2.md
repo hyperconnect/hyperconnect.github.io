@@ -140,7 +140,7 @@ Spinnaker의 application과 pipeline은 Front50 [[11]](https://github.com/spinna
 2. Jinja [[14]](https://jinja.palletsprojects.com/en/2.11.x/): Python에서 많이 사용되는 Jinja template를 사용하였습니다. Spinnaker pipeline template에서는 지원하지 않는 if-statement를 사용하여 특정 조건일 만족할 경우에만 artifact나 step을 추가 할 수 있고, for-statement를 사용해 비슷한 step을 여러 번 반복하여 만들 수 있습니다.
 3. Django: 빠른 프로타입을 만들 수 있는 편리한 ORM과 frontend 코딩을 하지 않아도 기본적인 CRUD가 가능한 admin 페이지 [[15]](https://docs.djangoproject.com/en/3.0/ref/contrib/admin/)를 지원하는 Django를 사용했습니다.
 
-#### Djang Model
+#### Django Model
 먼저, 데이터를 저장할 Django Model을 생성합니다. Template를 저장할 `PipelineTemplate` 모델과 microservice 정보를 저장할 `MicroService` 모델을 만들었습니다. 대부분의 설정이 stack에 따라 다르므로, 1개의 microservice는 여러 개의 stack을 가지고, 한 개의 stack은 여러 개의 pipeline을 가지도록 했습니다.
 ```python
 from django.db import models
