@@ -225,7 +225,7 @@ GPU가 다른 GPU에 있는 메모리에 접근해야 하는 경우가 있습니
 
     스위치 연결 토폴로지는 장단점이 다른 여러 가지 방식이 있고 모니터링 장비 등도 연결되어야 하기 때문에 꼭 최소의 스위치를 사용해야 하는 것은 아니지만, 서버의 HCA들이 all-to-all로 1:1 nonblocking 통신을 할 수 있도록 구성하는 것이 중요합니다.
 
-![Figure: example infiniband switch network topology]({{"assets/2020-12-21-deep-learning-cluster-1/superpod_su_infiniband_network_topology.png"}})
+![Figure: example infiniband switch network topology]({{"/assets/2020-12-21-deep-learning-cluster-1/superpod_su_infiniband_network_topology.png"}})
 
 ---
 
