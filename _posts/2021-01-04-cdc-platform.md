@@ -697,7 +697,7 @@ CDC Platform을 개발하여 다음과 같은 효과를 얻을 수 있었습니�
 
 
 # CDC & CDC Platform 이야기
-[1] [1편 - CDC Platform 개발](https://hyperconnect.github.io/2020/01/04/cdc-platform.html)  
+[1] [1편 - CDC Platform 개발](https://hyperconnect.github.io/2021/01/11/cdc-platform.html)  
 [2] [2편 - CDC Sink Platform 개발 : CQRS 패턴의 적용]
 
 
