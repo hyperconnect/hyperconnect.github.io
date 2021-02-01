@@ -31,7 +31,7 @@ CDC Platform은 어떤 특징을 가지고 있을까요?
 * At-least-once Delivery
 
 
-# CDC 기술을 선택한 이유 ? - Applivation Event VS Persistence Event
+# CDC 기술을 선택한 이유 ? - Application Layer Event VS Persistence Layer Event
 Application Layer를 기반으로 Event를 발행하는 방법도 있었을텐데, Persistence Layer 기반으로 이벤트를 발행하는 방식을 선택한 이유는 다음과 같습니다. Application에서 신뢰할 수 있는 Event를 발행하려면, 도메인 별 분리 및 DataSource 고립이 선행되어야 합니다. 현재, 서로 다른 프로젝트에서 Database를 공유하여 사용중이기 때문에, Application Layer 기반으로 Event를 발행할 경우 외부로 부터 발생한 변경사항에 따른 Event를 놓칠 수 있는 문제가 있었습니다. 따라서, 변경되었음을 근본적으로 신뢰할 수 있는 Persistence Layer 기반의 CDC 기술을 선택하게 되었습니다. 
 
 나아가, Application Layer 기반으로 Event를 발행하기 위해서는 Transactional Outbox Pattern 적용을 함께 고민해야 합니다. 대용량 데이터 베이스 환경에서 Transactional Outbox Pattern 구현을 위해 추가적인 Table을 설계하는 것은 부담이 있습니다. CDC 기술을 선택할 경우, 이미 저장소에 반영되었음을 저장소 차원에서 보장하기 때문에 Transactional Outbox Pattern 적용은 불필요합니다.
