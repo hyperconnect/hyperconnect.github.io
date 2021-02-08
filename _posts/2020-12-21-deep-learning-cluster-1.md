@@ -5,7 +5,7 @@ title: 초고성능 딥러닝 클러스터 구축하기 1편
 author: mumu
 tags: machine-learning hpc cluster superpod
 excerpt: Hyperconnect에서 GPU 기반 딥러닝 클러스터를 구축한 내용을 공유합니다.
-last_modified_at: 2020-12-21
+last_modified_at: 2021-02-08
 ---
 
 Hyperconnect의 AI Lab에서는 Vision, Audio, NLP 등 다양한 분야에서 수많은 ML 모델을 연구/개발하고 있습니다. 인공지능 연구가 잘 진행되기 위해서는 딥러닝 학습을 위한 인프라가 잘 갖추어져 있어야 하며, 이를 위해 리소스를 아낌없이 투자하고 있습니다.
@@ -31,14 +31,14 @@ GPU 클러스터가 구성되어 있으면 딥러닝 학습에 필요한 계산�
 
 ### Data parallelism
 
-병렬성에는 데이터(data)와 연산(task)의 두가지 측면이 있습니다. Data parallelism이란, 여러 프로세서가 같은 task를 다른 data에 대해 수행하는 것을 말합니다. Data parallelism의 쉬운 예를 살펴보죠.
+병렬성에는 데이터(data)와 연산(task)의 두가지 측면이 있습니다. 그 중 data parallelism이란, 여러 프로세서가 같은 task를 다른 data에 대해 수행하는 것을 말합니다. Data parallelism의 쉬운 예를 살펴보죠.
 
 ```python
 for i in range(3):
     a[i] += b[i]
 ```
 
-이 루프는 같은 덧셈(task)을 스텝 `i`에 따라 배열의 다른 부분(data)에 수행하고 있습니다. 각 스텝이 서로 의존성(dependence)이 없기 때문에 어떤 순서로 실행해도 상관이 없습니다. 동시에 실행할 수도 있죠.
+이 루프는 같은 덧셈(task)을 스텝 `i`에 따라 배열의 다른 부분(data)에 수행하고 있습니다. 각 스텝 `i`가 서로 의존성(dependence)이 없기 때문에 어떤 순서로 실행해도 상관이 없습니다. 동시에 실행할 수도 있죠.
 
 ```python
 thread[0]: a[0] += b[0]
@@ -46,13 +46,13 @@ thread[1]: a[1] += b[1]
 thread[2]: a[2] += b[2]
 ```
 
-Data parallelism의 특징은 계산량(data)이 증가함에 따라 병렬성도 따라서 증가하는 경우가 많다는 것입니다. 예를 들어 위 루프에서 다루는 데이터의 크기가 3에서 3000으로 1000배 증가한다면, 이에 맞추어 thread를 3개에서 3000개로 1000배 증가시킬 수 있죠. 때문에 확장성(scalability)이 좋습니다. 또, 계산 순서에서 상대적으로 자유롭기 때문에 동기화에 따른 성능 저하도 적습니다.
+Data parallelism의 특징은 요구되는 계산량(data)이 증가함에 따라 병렬성도 그에 따라 증가하는 경우가 많다는 것입니다. 예를 들어 위 루프에서 다루는 데이터의 크기가 3에서 3000으로 1000배 증가한다면, 병렬성도 1000배 증가하게 됩니다. 하드웨어만 받쳐준다면 thread를 3개에서 3000개로 1000배 증가시킬 수 있죠. 때문에 data parallelism은 확장성(scalability)이 좋습니다. (이러한 방식을 weak scaling이라고 함) 또, 계산 순서에서 상대적으로 자유롭기 때문에 동기화에 따른 성능 저하도 적습니다.
 
-계산 자원이 많이 필요한 수치해석, 시뮬레이션, 그래픽스, 그리고 **딥러닝** 도메인에는 data parallelism을 활용할 수 있는 여지가 굉장히 많습니다. 그리고 data parallelism을 잘 활용하는 프로세서가 바로 GPU입니다. GPU는 동시에 똑같은 연산을 수행하는 코어가 수천 개씩 들어있는 구조로, 각 코어에 데이터의 다른 부분(data)을 할당하여 병렬로 처리할 수 있습니다.
+계산 자원이 많이 필요한 수치해석, 시뮬레이션, 그래픽스, 그리고 **딥러닝** 도메인에는 data parallelism을 활용할 수 있는 여지가 굉장히 많습니다. 단순한 계산을 굉장히 많이 반복하는 패턴이기 때문이지요. 그런 data parallelism을 잘 활용하는 프로세서가 바로 GPU입니다.
 
-지난 2017년, Facebook에서는 대규모 분산 학습에서 배치의 크기와 learning rate 사이의 관계에 대한 연구 논문을 arxiv에 업로드하였습니다. 논문에서는 매 스텝마다 ImageNet 데이터셋에서 총 8192개의 샘플을 뽑아 256개의 Tesla P100 GPU에 각 32개씩 나누어주어 ResNet-50 모델을 단 1시간만에 학습할 수 있었다고 보고하였습니다. 이렇게 분산 학습하여 AllReduce한 결과가 1개 GPU 기준으로 32개 샘플을 가지고 학습하는 스텝을 256번 반복하여 누적시킨 결과가 거의 비슷하기 때문에 이런 방식의 확장이 가능했습니다.
+GPU는 동시에 똑같은 연산을 수행하는 코어가 수천 개씩 들어있는 구조로, 각 코어에 데이터의 다른 부분(data)을 할당하여 병렬로 처리할 수 있습니다. 1대 GPU에서 활용할 수 있는 것보다 문제의 data parallelism이 더 많다면 여러 GPU에 작업을 나누어주면 됩니다. 각 GPU가 다른 샘플에 대해 같은 파라미터를 가지고 같은 방식으로 학습시키는 것이니 일종의 data parallelism으로 볼 수 있겠죠. 이렇게 하면 코드 변경이 크게 필요 없고, 배치의 크기와 GPU를 선형적으로 늘려주면 됩니다.
 
-각 GPU가 다른 샘플에 대해 같은 파라미터를 가지고 같은 방식으로 학습시키는 것이니 일종의 data parallelism으로 볼 수 있겠죠. 때문에 코드의 변경이 크게 필요 없고, 단순히 배치의 크기와 GPU를 선형적으로 늘려주면 됩니다. 클러스터가 가장 잘 하는 일이죠.
+지난 2017년, Facebook에서는 대규모 분산 학습에서 배치의 크기와 learning rate 사이의 관계에 대한 연구 논문을 arxiv에 업로드하였습니다. 논문에서는 매 스텝마다 ImageNet 데이터셋에서 총 8192개의 샘플을 뽑아 256개의 Tesla P100 GPU에 각 32개씩 나누어주어 ResNet-50 모델을 단 1시간만에 학습할 수 있었다고 보고하였습니다. 이렇게 분산 학습하여 AllReduce한 결과가 1개 GPU 기준으로 32개 샘플을 가지고 학습하는 스텝을 256번 반복하여 누적시킨 결과와 거의 비슷하기 때문에 이런 방식의 확장이 가능했습니다.
 
 당시에 NVIDIA Tesla P100 GPU와 50G Ethernet 네트워크로 이 정도의 결과를 얻었는데요, 다음 세대 라인업 하드웨어인 NVIDIA V100 GPU와 100G Ethernet 네트워크를 이용한다면 수 분만에 학습이 가능합니다.
 
@@ -68,36 +68,36 @@ Data parallelism의 특징은 계산량(data)이 증가함에 따라 병렬성�
 def AllReduce(id, data_send: List[T]) -> List[T]:
   data_recv = []
   # 1. 각 GPU에서 계산된 그라디언트(data_send)를 모두 한 GPU에 모은다.
-  Gather(from=id, to=0, src=data_send, dst=data_recv)
+  Gather(from=id, to=0, src=data_send, dst=data_recv)  # blocking
   # 2. 한 GPU에 모인 그라디언트(data_recv)를 합산한다.
   data_send = sum(data_recv) if id == 0
   # 3. 합산된 그라디언트(data_send)를 모든 GPU로 보내준다.
-  Broadcast(from=0, to=id, src=data_send, dst=data_recv)
+  Broadcast(from=0, to=id, src=data_send, dst=data_recv)  # blocking
   return data_recv
 ```
 
-그렇지만 이 방식은 모든 GPU와 한 GPU 사이의 통신이 이루어져야 하기 때문에, 데이터가 몰리는 GPU 쪽 트래픽에서 병목이 발생합니다. 메모리 사용량도 많습니다. 보통은 좀 더 효율적으로 통신하는 알고리즘을 이용하는데, 가장 잘 알려진 방식은 Ring-AllReduce입니다.
+그렇지만 이 방식은 모든 GPU와 한 GPU 사이의 통신이 이루어져야 하기 때문에, 데이터가 몰리는 GPU 쪽 트래픽에서 병목이 발생합니다. 메모리 사용량도 너무 많아 OOM 에러가 발생하기 쉽습니다. 보통은 좀 더 효율적으로 통신하는 알고리즘을 이용하는데, 가장 잘 알려진 방식은 Ring-AllReduce입니다.
 
 ```python
 def RingAllReduce(id, data: List[T]) -> List[T]:
   # 1. (GPU 개수 - 1)만큼 반복한다.
   for n in range(N-1):
     # 1.1. 합산할 데이터 일부를 다음 GPU로 보내준다.
-    Send(to=(id+1), src=data[id-n])
+    Send(to=(id+1), src=data[id-n])  # nonblocking
     # 1.2. 이전 GPU에서 보내준 데이터를 받는다.
-    Receive(from=(id-1), dst=data[id-n])
+    Receive(from=(id-1), dst=data[id-n])  # blocking
     # 1.3. 받은 데이터를 보낼 데이터에 합산한다.
     data[id-1-n] += data[id-n]
   # 2. (GPU 개수 - 1)만큼 반복한다.
   for n in range(N-1):
     # 2.1. 합산된 데이터 일부를 다음 GPU로 보내준다.
-    Send(to=(id+1), src=data[id+1-n])
+    Send(to=(id+1), src=data[id+1-n])  # nonblocking
     # 2.2 이전 GPU에서 보내준 데이터를 받는다.
-    Receive(from=(id-1), dst=data[id-n])
+    Receive(from=(id-1), dst=data[id-n])  # blocking
   return data
 ```
 
-이 방식을 이용하면 모든 GPU가 고르게 데이터를 주고 받기 때문에 트래픽 병목이 발생하지 않고, 하드웨어의 양방향 통신을 이용하여 주고 받는 과정을 동시에 처리하도록 최적화할 수 있습니다.
+Ring-AllReduce 알고리즘을 이용하면 모든 GPU가 고르게 데이터를 주고 받기 때문에 트래픽 병목이 발생하지 않고, 하드웨어의 양방향 통신 기능을 이용하여 주고 받는 과정을 동시에 처리하도록 최적화할 수 있습니다.
 
 ---
 
@@ -109,45 +109,67 @@ Task parallelism은 data parallelism과 다른 방향의 병렬성으로, 여러
 
 ```python
 for i in range(3):
-    b[i] = f(a[i])
-    c[i] = g(b[i])
+    b[i] = f(a[i])  # thread-unsafe function f()
+    c[i] = g(b[i])  # thread-unsafe function g()
 ```
 
-이 루프는 다른 계산(task)을 같은 배열(data)에 차례로 수행하고 있습니다. Pipelining 패턴으로 병렬화할 수 있는 대표적인 예시입니다. (여기서 `f()`그리고 `g()`는 thread-safe하지 않은 작업이라고 가정)
+이 루프는 같은 배열(data)을 이용하여 다른 계산(task)을 차례로 수행하고 있습니다. Pipelining 패턴으로 병렬화할 수 있는 대표적인 예시입니다.
 
 ```python
 thread[0]: b[0] = f(a[0]) | b[1] = f(a[1]) | b[2] = f(b[2]) |
 thread[1]:                | c[0] = g(b[0]) | c[1] = g(b[1]) | c[2] = g(b[2])
 ```
 
-Task parallelism의 특징은 계산량(data)이 아니라 프로그램 특성(task)에 따라 병렬성이 결정된다는 점입니다. 예를 들어 위 루프에서 다루는 데이터의 크기를 3에서 3000으로 늘리더라도 동시에 연산할 수 있는 thread의 수는 2개가 한계입니다. 각 스텝이 서로 의존성이 있기 때문입니다. 이와 같은 의존성에 의해 동기화 오버헤드(`|`)가 발생하고, 확장성 역시 프로그램 특성에 의해 제한됩니다.
+Task parallelism의 특징은 계산의 양(data)이 아니라 프로그램 특성(task)에 따라 병렬성이 결정된다는 점입니다. 예를 들어 위 루프에서 다루는 데이터의 크기를 3에서 3000으로 늘리더라도 동시에 연산할 수 있는 thread의 수는 2개가 한계입니다. 각 스텝(`f()`, `g()`)이 서로 의존성이 있기 때문입니다. 이와 같은 의존성에 의해 동기화 오버헤드(`|`)가 발생하고, 확장성 역시 프로그램 특성에 의해 제한됩니다.
 
 ---
 
 ### Model parallelism
 
-모든 병렬 처리 패턴은 data parallelism과 task parallelism 사이 어딘가에 위치합니다. GPU 레이어를 쪼개고 이에 대응하는 모델 파라미터를 여러 GPU로 나누는 패턴인 model parallelism도 그 중 하나입니다.
+모든 병렬 처리 패턴은 data parallelism과 task parallelism의 조합입니다. GPU 레이어를 쪼개고 이에 대응하는 모델 파라미터를 여러 GPU로 나누는 패턴인 model parallelism도 그 중 하나입니다.
 
-Model parallelism이란, 각 디바이스에 ML 모델 학습에 필요한 연산(task)을 쪼개어 할당하고 그에 따라 파라미터(data)도 나누어 할당한 후, 같은 입력(data)에 대해 연산의 다른 부분(task)을 처리하고, 각 결과를 합산(reduction/concat)하여 출력(data)을 만드는 병렬화 방식입니다.
+Model parallelism이란:
+
+- 각 디바이스에 ML 모델 학습에 필요한 연산(task)을 쪼개어 할당하고
+- 그에 따라 파라미터(data)도 나누어 할당한 후
+- 같은 입력(data)에 대해 연산의 다른 부분(task)을 처리하고
+- 각 결과를 합산(reduction/concat)하여 출력(data)을 만드는 병렬화 방식입니다.
+
+행렬 곱셈(`@`) 예제로 model parallelism과 다른 parallelism의 차이점에 대해 살펴봅시다.
 
 ```python
-c[0:3] = a[0:3][0:3] @ b[0:3]
+y[0:3][0:3] = x[0:3][0:3] @ w[0:3][0:3]
 ```
 
-행렬 곱셈(`@`) 예제를 가지고 왔습니다. 여기서 `a[][]`는 파라미터, `b[]`는 입력, `c[]`는 출력을 나타냅니다. 행렬 곱셈 연산(task)은 특성 상 더 작은 행렬 곱셈으로 쪼갤 수 있고, 그에 따라 파라미터(data)를 각 thread에 나누어줄 수 있습니다.
+위 식에서 `x`는 입력, `w`는 파라미터, `y`는 출력을 나타냅니다. 행렬 곱셈 연산(task)은 특성 상 더 작은 행렬 곱셈으로 쪼갤 수 있고, 그에 따라 입력(data_1)이나 파라미터(data_2)를 각 thread에 나누어줄 수 있습니다.
+
+Data parallelism 관점에서 보면 행렬 곱셈에서 주된 data는 "입력"에 해당하는 `x`입니다. `x`의 row를 각 thread에 분배하면 thread는 동일한 "모델" `w`를 이용하여 같은 연산(task)을 진행하여 `y`의 각 row를 얻을 수 있습니다. (행렬이 `row-major`로 저장되어 있다고 가정하면) 데이터를 나누고 합치는 과정이 아주 자연스럽습니다. 하지만 `w`를 모든 thread에서 온전히 갖고 있어야 하기 때문에, 모델의 크기가 한 thread가 감당할 수 없을만큼 커지면 순수 data parallelism만으로는 병렬화가 불가능하게 됩니다.
 
 ```python
-thread[0]: c[0:1] = a[0:1][0:3] @ b[0:3]
-thread[1]: c[2:3] = a[2:3][0:3] @ b[0:3]
+# row-wise
+thread[0]: y[0][0:3] = x[0][0:3] @ w[0:3][0:3]
+thread[1]: y[1][0:3] = x[1][0:3] @ w[0:3][0:3]
+thread[2]: y[2][0:3] = x[2][0:3] @ w[0:3][0:3]
+thread[3]: y[3][0:3] = x[3][0:3] @ w[0:3][0:3]
 ```
 
-모델의 크기가 커지면 그에 따라 병렬성이 커지기 때문에 (더 많은 디바이스에 나누어줄 수 있음) data parallelism의 측면이 있고, 처리하는 데이터가 많아지더라도 병렬성이 변함없기 때문에 (모든 디바이스에 같은 입력을 전달해주어야 함) task parallelism의 측면도 있는 것이죠.
+Model parallelism 관점에서 보면 행렬 곱셈에서 주된 data는 "모델"에 해당하는 `w`입니다. `w`의 column을 각 thread에 분배하면 thread는 동일한 "입력" `x`를 이용하여 다른 연산(task)을 진행하여 `y`의 각 column을 얻을 수 있습니다. (행렬이 `row-major`로 저장되어 있다고 가정하면) 결과를 합치는 과정에서 메모리 이동이 많이 일어나게 됩니다. 대신 `w`를 모든 thread에서 온전히 갖고 있을 필요가 없습니다.
+
+```python
+# column-wise
+thread[0]: y[0:3][0] = x[0:3][0:3] @ w[0:3][0]
+thread[1]: y[0:3][1] = x[0:3][0:3] @ w[0:3][1]
+thread[2]: y[0:3][2] = x[0:3][0:3] @ w[0:3][2]
+thread[3]: y[0:3][3] = x[0:3][0:3] @ w[0:3][2]
+```
+
+Model parallelism을 활용하는 병렬화 방식은 모델의 크기가 커지면 그에 따라 병렬성이 커지기 때문에 (더 많은 디바이스에 나누어줄 수 있음) data parallelism의 측면이 있고, 처리하는 데이터가 많아지더라도 병렬성이 변함없기 때문에 (모든 디바이스에 같은 입력을 전달해주어야 함) task parallelism의 측면도 있는 것이죠.
 
 배치 데이터를 크게 하여 data parallelism을 활용할 수 있다면 굳이 확장성이 나쁜 model parallelism을 쓸 이유가 없다고 생각할 수도 있지만, 파라미터가 엄청나게 많은 모델은 model parallelism을 이용해야 파라미터를 GPU 메모리에 들어갈 정도로 나눌 수 있다는 점에서 활용처가 다르다고 할 수 있겠네요.
 
 Transformer 아키텍쳐가 발표된 이후, 신경망을 이용한 language model은 transformer의 크기를 계속해서 키우는 방향으로 발전해왔습니다. 현재까지 공개된 language model 중 가장 강력한 GPT-3는 파라미터의 수가 무려 1746억개입니다. (논문에서 추산한) 학습에 필요한 총 계산량은 314000000 PFLOP이며, 이는 DGX-A100 한 대의 학습 이론 성능(5 PFLOPS)을 100% 발휘해도 2년이 걸리는 수준입니다.
 
-미리 학습된 GPT-3 모델로 추론만 하려고 해도 350GB 이상 메모리가 필요하며. 학습을 위해서는 이것보다 몇 배 더 많은 메모리가 필요합니다. 하지만 GPU 메모리 용량은 많아야 10~40GB 정도이기 때문에 model parallelism을 활용하여 여러 GPU에 모델을 쪼개 넣는 것이 **필수불가결**합니다.
+미리 학습된 GPT-3 모델로 추론만 하려고 해도 350GB 이상 메모리가 필요하며. 학습을 위해서는 이것보다 몇 배 더 많은 메모리가 필요합니다. 하지만 GPU 메모리 용량은 많아야 10~40GB 정도이기 때문에 model parallelism을 활용하여 여러 GPU에 모델을 쪼개 넣게 됩니다. 또한 대량의 데이터를 학습하기 위해서 data parallelism도 함께 활용하게 됩니다.
 
 GPT-3의 학습을 위해 Microsoft Azure에서 OpenAI에 계산용 GPU 10000대를 서버 당 400Gbps 고속 네트워크로 연결한 슈퍼 컴퓨터를 제공했다고 하는데요, 정말 어마어마하군요.
 
@@ -163,9 +185,9 @@ GPT-3의 학습을 위해 Microsoft Azure에서 OpenAI에 계산용 GPU 10000대
 
 1. **FLOPS**
 
-    GPU가 1초 동안 몇 개의 부동소수점(floating-point) 연산을 할 수 있는 지를 나타내는 성능 척도입니다. FLOPS가 크면 같은 시간 동안 더 많은 계산을 처리할 수 있으니 성능이 좋다는 뜻이겠죠. 1000000 FLOPS = 1 GFLOPS, 1000 GFLOPS = 1 TFLOPS, 1000 TFLOPS = 1 PFLOPS입니다.
+    GPU가 1초 동안 몇 개의 부동소수점(floating-point) 연산을 할 수 있는 지를 나타내는 성능 척도입니다. FLOPS가 크면 같은 시간 동안 더 많은 계산을 처리할 수 있으니 성능이 좋다는 뜻이겠죠. `1000000 FLOPS = 1 GFLOPS`, `1000 GFLOPS = 1 TFLOPS`, `1000 TFLOPS = 1 PFLOPS`입니다.
 
-    GPU의 구조를 쉽게 설명하자면 단순한 연산을 처리하는 코어가 수천 개 있어서 동시에 많은 수의 연산을 처리하는 형태입니다. 그렇기 때문에 GPU는 코어가 기껏해야 수십 개인 CPU보다 FLOPS가 훨씬 높습니다. 그래서 GPU는 그래픽스, 시뮬레이션, 딥러닝 등 독립적인 연산이 아주 많은 애플리케이션 가속에 널리 이용됩니다.
+    GPU의 구조를 쉽게 설명하자면 단순한 부동소수점 연산을 처리하는 코어가 수천 개 있어서 동시에 많은 수의 연산을 처리하는 형태입니다. 그렇기 때문에 GPU는 코어가 기껏해야 수십 개인 CPU보다 FLOPS가 훨씬 높습니다. 그래서 GPU는 그래픽스, 시뮬레이션, 딥러닝 등 독립적인 연산이 아주 많은 애플리케이션 가속에 널리 이용됩니다.
 
     부동 소수점 연산의 정밀도(precision)에 따라 기준이 되는 FLOPS 값이 달라질 수 있습니다. 계산용 GPU에서는 보통 FP32(=SP) 성능이 FP64(=DP) 성능의 2배 정도, FP16(=HP) 성능은 FP32(=SP) 성능의 2배 이상이 됩니다. 성능이 높아지는 대신 정밀도가 떨어지기는 하지만, 과학 분야의 애플리케이션이 아니라면 높은 정밀도를 필요로 하지는 않습니다. 특히 추론 단계에서는 FP16으로도 충분합니다. 최근에는 딥러닝 학습에서 FP16 정밀도를 사용하는 경우도 많습니다.
 
@@ -175,7 +197,7 @@ GPT-3의 학습을 위해 Microsoft Azure에서 OpenAI에 계산용 GPU 10000대
 
     메모리 용량은 GPU가 처리할 수 있는 배치의 크기나 모델의 크기와 관련이 있습니다.
 
-    - 배치의 크기: 메모리가 크면 한 GPU에서 더 많은 배치를 처리할 수 있으므로, Data parallelism 활용도를 늘려 같은 데이터셋을 더 빠르게 학습할 수 있습니다.
+    - 배치의 크기: 메모리가 크면 한 GPU에서 더 많은 배치를 처리할 수 있으므로, data parallelism 활용도를 늘려 같은 데이터셋을 더 빠르게 학습할 수 있습니다.
     - 모델의 크기: GPU는 연산을 위해 모델의 파라미터를 메모리에 담아두기 때문에 이를 위한 메모리 용량이 충분해야 합니다. Model parallelism으로 여러 GPU에 파라미터를 나누는 데는 제약 사항도 많고 동기화/통신 비용이 증가하기 때문에 한계가 있습니다.
 
     GPU의 메모리 용량 뿐만 아니라 시스템 메모리 용량도 어느 정도 확보해야 합니다. 결국 배치나 모델이 시스템 메모리에서 각 GPU로 전송되는 것이기 때문에, 시스템 메모리가 모든 GPU의 메모리를 합한 것보다는 커야 병목이 되지 않습니다.
@@ -197,9 +219,11 @@ GPT-3의 학습을 위해 Microsoft Azure에서 OpenAI에 계산용 GPU 10000대
 
     이렇게 데이터를 주고 받을 때 사용되는 대표적인 인터페이스로 PCI Express(PCIe)가 있습니다. PCIe는 여러 개의 lane으로 구성되어 있는데, 현재 표준으로 사용되는 PCIe 3.0 버전은 lane 당 (x1) 약 1GB/s의 대역폭으로, 최신 CPU/마더보드에서 지원하는 PCIe 4.0 버전은 그 두 배인 lane 당 (x1) 약 2GB/s의 대역폭으로 양방향 통신이 가능합니다.
 
-    보통 GPU는 16 lane 너비(x16)를 지원하므로 PCIe 3.0 기준 약 15.75GB/s의 대역폭으로 양방향 통신이 가능합니다. 하지만 CPU에서 지원하는 PCIe lane 수가 부족하면 일부 GPU는 x16으로 동작하지 못하고 x8로 동작하는 경우가 생깁니다. 서버급 Intel CPU에서는 소켓 당 48 lane 수준을 지원하므로, 일반적인 2소켓 구성으로는 48 * 2 = 96 lane을 사용할 수 있습니다. 다시 말해, GPU와 고속 네트워크 카드를 합쳐 최대 6개까지만 제 성능으로 지원할 수 있는 것이죠.
+    보통 GPU는 16 lane 너비(x16)를 지원하므로 PCIe 3.0 기준 약 15.75GB/s의 대역폭으로 양방향 통신이 가능합니다. 하지만 CPU에서 지원하는 PCIe lane 수가 부족하면 일부 GPU는 x16으로 동작하지 못하고 x8로 동작하는 경우가 생깁니다.
 
-    NVIDIA에서는 NVIDIA GPU 고속 통신를 위해 NVLink 기술을 제공합니다. 예를 들어 NVLink 2세대(e.g. V100)에서는 150GB/s의 대역폭, NVLink 3세대(e.g. A100)에서는 300GB/s의 대역폭으로 각각 PCIe 3.0, PCIe 4.0보다 9배 가량 넓은 대역폭으로 통신할 수 있습니다. PCIe로는 병목이 걸리는 규모의 데이터 전송도 NVLink를 이용하게 되면 문제가 없습니다. 하지만 마더보드에서 지원을 해줘야 사용이 가능하며, GPU에 따라서는 별매품 NVLink 브릿지를 설치해야하는 경우도 있습니다.
+    서버급 Intel CPU에서는 소켓 당 48 lane를 지원합니다. 이는 일반적인 2소켓 구성 상 48 * 2 = 96 lane을 사용할 수 있어 GPU와 고속 네트워크 카드(HCA)를 합쳐 최대 6개까지만 제 성능으로 지원할 수 있습니다. 반면 서버급 최신 AMD CPU에서는 소켓 당 96 lane까지도 지원하므로, 훨씬 큰 대역폭을 운용할 수 있습니다. NVIDIA의 고성능 서버 라인업인 DGX가 Intel에서 AMD로 변경된 이유이기도 하죠.
+
+    NVIDIA에서는 PCIe와 별도로 NVIDIA GPU 간 고속 통신를 위해 NVLink 기술을 제공합니다. 예를 들어 NVLink 2세대(e.g. V100)에서는 150GB/s의 대역폭, NVLink 3세대(e.g. A100)에서는 300GB/s의 대역폭으로 각각 PCIe 3.0, PCIe 4.0보다 9배 가량 넓은 대역폭으로 통신할 수 있습니다. PCIe로는 병목이 걸리는 규모의 데이터 전송도 NVLink를 이용하게 되면 문제가 없습니다. 하지만 범용 인터페이스인 PCIe와는 달리 지원을 해주는 일부 메인보드에서만 사용이 가능하며, GPU에 따라서는 별매품 NVLink 브릿지를 설치해야하는 경우도 있습니다.
 
 ### 서버를 연결하는 기술 알아보기
 
@@ -233,7 +257,7 @@ GPU가 다른 GPU에 있는 메모리에 접근해야 하는 경우가 있습니
 
 딥러닝 연구는 점점 더 많은 데이터, 더 많은 계산 자원을 요구하고 있습니다. 그리고 이를 위한 고성능 컴퓨팅 기술도 점점 고도화되어가고 있죠. 접근하기가 어렵습니다. 그래서 보통 ML 연구 팀은 클라우드 상에서 딥러닝 학습을 진행합니다. AWS나 GCP 등 클라우드 서비스에서 멀티노드 학습이 가능한 GPU 인스턴스를 제공해주는 덕분이죠. 게다가 클라우드를 이용하면 (이미 클라우드에 저장해두었던) 데이터를 사용하기 편리하고, 인프라 구축과 운영이 필요 없고, 수요에 따라 스케일링하기가 굉장히 쉽습니다.
 
-하지만 장점이 있으면 단점도 있는 법이죠. 유동적으로 자원을 할당해주는 클라우드 인프라의 특성 상, 서버와 서버를 연결하는 고속 인터커넥트 네트워크를 최고성능으로 제공하기는 어렵습니다. 더 큰 language model을 더 많이 연구하기 위해서는 클라우드에서 제공해주는 인프라보다 더 최적화된 환경이 필요했습니다.
+하지만 장점이 있으면 단점도 있는 법이죠. 유동적으로 자원을 할당해주는 클라우드 인프라의 특성 상, 서버와 서버를 연결하는 고속 인터커넥트 네트워크를 최고성능으로 제공하기는 어렵습니다. 더 큰 language model을 더 많이 연구하기 위해서는 클라우드에서 제공해주는 인프라보다 최적화된 환경이 필요했습니다.
 
 비용도 큰 문제입니다. 클라우드는 편리하지만 저렴하진 않습니다. 딥러닝 연구는 머니게임이 되어가고 있고, 이에 따라 클라우드 사용량이 늘면 지출하는 비용도 그에 비례하여 증가합니다. Hyperconnect AI Lab의 사용 패턴에 따르면 2021년에는 매월 지불하는 비용이 수억 원에 육박하는 것으로 추산되었습니다. 매달 최고사양 GPU 서버를 한 대씩 태우는 꼴이죠.
 
@@ -245,7 +269,7 @@ NVIDIA에서는 앞서 살펴본 요구 사항을 모두 만족하는 GPU 클러
 
 탑재된 A100 GPU는 총 160개로 새로 추가된 모드인 TF32 정밀도 기준 이론 성능은 25 PFLOPS입니다. 대략적으로 비교해보면 이는 국가슈퍼컴퓨팅센터(KISTI)의 최대 규모 CPU 클러스터 시스템인 슈퍼컴퓨터 5호기 '누리온'의 이론 성능 25.7 PFLOPS에 육박하며, 함께 운용하는 163개 GPU 클러스터 시스템인 '뉴론'의 성능 1.24PF의 **20배**에 달하는 수치입니다.
 
-서버를 연결하기 위한 고속 인터커넥트 네트워크는 Mellanox Infiniband HDR로 케이블 당 200Gbps의 대역폭이며, DGX-A100 한 대에 8개의 HCA가 장착되어 있으니 서버마다 총 1.6Tbps의 대역폭으로 양방향 데이터 교환이 가능합니다. Infiniband 스위치는 14개를 리프-스파인의 2레벨로 구성하였습니다. 리프 레벨에서 스위치 i의 downlink 20개는 각 서버의 i번째 HCA와 연결, uplink 20개는 스파인 레벨의 모든 스위치에 고르게 연결되어 1:1 nonblocking로 통신하도록 했습니다.
+서버를 연결하기 위한 고속 인터커넥트 네트워크는 Mellanox Infiniband HDR로 케이블 당 200Gbps의 대역폭이며, DGX-A100 한 대에 8개의 HCA가 장착되어 있으니 서버마다 총 1.6Tbps의 대역폭으로 양방향 데이터 교환이 가능합니다. Infiniband 스위치는 14개를 리프-스파인의 2레벨로 구성하였습니다. 리프 레벨에서 스위치 `i`의 downlink 20개는 각 서버의 `i`번째 HCA와 연결, uplink 20개는 스파인 레벨의 모든 스위치에 고르게 연결되어 1:1 nonblocking로 통신하도록 했습니다.
 
 그 외에 사용자가 접속하여 사용하는 로그인 서버, 관리용 서버, 성능 모니터링 시스템, 공유 스토리지 클러스터 등도 마찬가지로 Infiniband 네트워크로 묶어 관리합니다. 이를 바탕으로 환경 꼬임이나 연구자 간 충돌 없이, 분산 학습에서 계산 자원을 효율적으로 활용할 수 있도록 노력하고 있습니다.
 
@@ -265,6 +289,7 @@ NVIDIA에서는 앞서 살펴본 요구 사항을 모두 만족하는 GPU 클러
 1. [Big Basin](https://engineering.fb.com/2017/03/08/data-center-engineering/introducing-big-basin-our-next-generation-ai-hardware/)
 1. [Stanford DOWNBench: ImageNet Training](https://dawn.cs.stanford.edu/benchmark/ImageNet/train.html)
 1. [Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361)
+1. [Megatron-LM](https://arxiv.org/pdf/1909.08053.pdf)
 1. [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)
 1. [DGX-A100](https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/nvidia-dgx-a100-datasheet.pdf)
 1. [NVIDIA Data Center Benchmark](https://developer.nvidia.com/deep-learning-performance-training-inference)
