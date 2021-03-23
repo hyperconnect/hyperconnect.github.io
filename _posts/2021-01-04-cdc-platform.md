@@ -18,6 +18,10 @@ Event Driven Architecture는 이벤트를 발행하고 소비하는 패턴을 �
 먼저, CDC라는 개념에 대해 처음 들어보는 분도 있을 것 같아 그 의미를 알아 보겠습니다. CDC란 무엇일까요? `CDC == Change Data Capture`. 즉, 변경된 데이터를 캡쳐하는 것을 의미합니다.
 
 
+# CDC 이론의 응용과 최종 일관성
+현재 상태는 과거로부터 발생한 모든 변경 사항의 누적합과 같습니다.  [최종 일관성 개념](https://en.wikipedia.org/wiki/Eventual_consistency)을 함께 적용해본다면 모든 변경사항을 지속적으로 누적해서 더하면 언젠가는 현재 상태에 수렴하게 될 것입니다. 이 이론을 적용하는 것으로 결합도가 낮고 확장성이 높은 시스템을 설계할 수 있습니다. 앞으로 CDC & CDC Sink Platform 개발 전 편에서 다룰 주제는 모두 CDC Pattern과 최종 일관성 이론을 기반으로 합니다.
+
+
 # CDC Platform 소개
 그렇다면 오늘의 주제인 CDC Platform이 하는 역할은 무엇일까요? `CDC Platform == DataSource -> Kafka`. 즉, DataSource로부터 변경된 데이터를 캡쳐하여 Kafka로 전송하는 역할을 담당합니다. Kafka Connect를 기반으로 DataSource -> Kafka의 역할을 하는 Application을 CDC Platform이라 정의하였습니다.
 
@@ -97,22 +101,22 @@ Distributed Mode는 Kafka Connect에 대한 확장성 및 내결함성을 제공
 
 내부 구조를 살펴보면 다음과 같은 특징임을 알 수 있습니다.
 * 첫째, 각 Source에 매핑되는 Connector를 사용하여 Kafka로 변경 이벤트를 전송합니다.
-* 둘째, Source Connector를 통해 다수의 Source로 확장 가능합니다.
+* 둘째, [Source Connector](https://www.confluent.io/hub) 를 통해 다수의 Source로 확장 가능합니다. (MySQL, PostgreSQL, Oracle, HDFS, MongoDB, Ignite, ElasticSearch, Cassandra 등) 
 
 
 # CDC Platform 설치
 CDC Platform은 이식성을 높이기 위해 Docker 기반으로 패키징하여 구성합니다.
 
 ```dockerfile
-FROM confluentinc/cp-kafka-connect-base:6.0.0
+FROM confluentinc/cp-kafka-connect-base:6.1.0
 
 ENV CONNECT_PLUGIN_PATH="/usr/share/java,/usr/share/confluent-hub-components" \
     CUSTOM_SMT_PATH="/usr/share/java/custom-smt" \
     CUSTOM_CONNECTOR_MYSQL_PATH="/usr/share/java/custom-connector-mysql"
 
 
-ARG CONNECT_TRANSFORM_VERSION=1.3.2
-ARG DEBEZIUM_VERSION=1.3.0
+ARG CONNECT_TRANSFORM_VERSION=1.4.0
+ARG DEBEZIUM_VERSION=1.4.1
 
 
 # Download Using confluent-hub
@@ -144,13 +148,15 @@ CDC Platform은 Kafka Connect를 통해 다음과 같은 REST API를 제공합�
 ## CDC Platform Connector 운영 - Connector 등록
 여러 작업 중 가장 핵심이라고 볼 수 있는 Connector 등록 Script를 살펴보겠습니다. Connector에서 필요한 정보를 작성하여 API를 통해 등록합니다.
 
+이 과정에서, Connector에서 Snapshot 기능을 지원하는 경우 이미 적재된 기존 데이터들의 특정 시점 Snapshot 그리고 해당 시점 이후의 Event Stream까지 누락 없이 모든 데이터 변경을 전송하게 할 수 있습니다. 보편적으로 사용하는 MySQL의 [Debezium MySQL Source Connector](https://debezium.io/documentation/reference/connectors/mysql.html)의 경우 snapshot.mode 설정을 통해 Snapshot 기능 사용여부를 설정할 수 있습니다. 따라서, 필요할 경우 Connector를 통해 모든 데이터를 다시 복원하는 흐름까지도 만들어 낼 수 있습니다.
+
 ```
 #!/bin/sh
 
 # Argument Validation
-if [ "$#" -ne 5 ]; then
+if [ "$#" -ne 8 ]; then
     echo "$# is Illegal number of parameters."
-    echo "Usage: $0 [cdc_url] $1 [database_url] $2 [database_user] $3 [database_password] $4 [kafka_bootstrap_servers]"
+    echo "Usage: $0 [cdc_url] $1 [database_url] $2 [database_user] $3 [database_password] $4 [database_include_list] $5 [kafka_bootstrap_servers] $6 [snapshot_mode] $7 [replication_factor]"
 	exit 1
 fi
 
@@ -161,24 +167,28 @@ cdc_url=${args[0]}
 database_url=${args[1]}
 database_user=${args[2]}
 database_password=${args[3]}
-kafka_bootstrap_servers=${args[4]}
+database_include_list=${args[4]}
+kafka_bootstrap_servers=${args[5]}
+snapshot_mode=${args[6]}
+replication_factor=${args[7]}
 
 
 curl -i -X PUT -H "Accept:application/json" -H "Content-Type:application/json" ${cdc_url}/connectors/test_db_connector/config -d '{
   "connector.class": "io.debezium.connector.mysql.MySqlConnector",
-  "tasks.max": "1",
-  "database.hostname": "'${database_url}'",
+  "tasks.max": "1",  
+  "database.hostname": "'${database_url}'",  
   "database.port": "3306",
   "database.user": "'${database_user}'",
   "database.password": "'${database_password}'",
-  "database.server.name": "cdc-data.test",
+  "database.server.name": "cdc-data.azar",
+  "database.include.list": "'${database_include_list}'",
   "database.history.kafka.bootstrap.servers": "'${kafka_bootstrap_servers}'",
   "database.history.kafka.topic": "cdc-schema.test",
-  "snapshot.locking.mode": "minimal",
+  "snapshot.locking.mode": "none",
   "max.batch.size": "20480",
   "max.queue.size": "81920",
   "poll.interval.ms": "100",
-  "snapshot.mode": "initial",
+  "snapshot.mode": "'${snapshot_mode}'",
   "snapshot.new.tables": "parallel",
   "producer.override.acks": "-1",
   "producer.override.max.in.flight.requests.per.connection": "1",
@@ -188,7 +198,7 @@ curl -i -X PUT -H "Accept:application/json" -H "Content-Type:application/json" $
   "errors.tolerance": "all",
   "errors.log.enable": "true",
   "errors.log.include.messages": "true",
-  "topic.creation.default.replication.factor": "2",
+  "topic.creation.default.replication.factor": "'${replication_factor}'",
   "topic.creation.default.partitions": "11"
 }'
 ```
@@ -213,7 +223,7 @@ args=("$@")
 cdc_url=${args[0]}
 
 
-curl -X GET ${cdc_url}/connectors?expand=status
+curl -f -X GET ${cdc_url}/connectors?expand=status
 ```
 
 
@@ -315,7 +325,7 @@ Mysql Source Connector에서 사용할 Database 계정이 필요하며, 필요�
 
 
 ## CDC Platform 장애 탐지 - 설정 
-Kafka Connect 6.0.0 기준, log4j를 지원합니다. log4j.properties 설정을 활용하여 특정 Log Level 이상의 로그를 Sentry로 전송합니다. 이를 통해 장애를 인지하고 대응할 수 있습니다.
+Kafka Connect 6.1.0 기준, log4j를 지원합니다. log4j.properties 설정을 활용하여 특정 Log Level 이상의 로그를 Sentry로 전송합니다. 이를 통해 장애를 인지하고 대응할 수 있습니다.
 
 ```properties
 log4j.rootLogger=INFO, stdout, Sentry
@@ -686,6 +696,17 @@ Schema 정보를 Kafka로 전송하는 Data에 포함할 수 있으며, 포함�
 이때, Schema 정보를 매번 Data와 함께 매번 전송하는 것은 성능 관점에서 좋지 않습니다. 하지만, Schema Registry를 적용하면 Schema의 정보는 Version만 전송하여 성능과 Schema 관리의 이점을 모두 누릴 수 있습니다. Confluent Schema Registry의 경우 Avro, Protobuf, Json 기반의 Schema를 지원합니다. 그리고 CDC Platform에서는 Confluent에서 권장하는 Avro를 적용하였습니다.  
 
 
+# 실전 및 운영 - CDC Event의 순서 보장
+보편적으로 사용하는 MySQL Source Connector 기준으로 살펴보겠습니다. MySQL은 Binlog를 기반으로하기 때문에 기본적으로 데이터베이스에서 처리된 순서를 보장합니다. 하지만 이는 데이터베이스에서 처리된 순서를 보장하는 것이지, Kafka에 적재된 순서가 이와 일치한다는 것을 보장하지는 않습니다. MySQL Connector가 Binlog를 읽어 Kafka로 전송할 때, Primary Key가 존재하는 Table일 경우 동일한 Primary Key에 대해, 동일한 Kafka Partition으로 전송하는 것으로 이벤트의 순서를 보장합니다. Primary Key가 Composite Primary Key일 경우에도, 동일한 Kafka Partition으로 전송됩니다. 반면 Primary Key가 없는 Table의 경우, Partition Key는 null이 되기 때문에 Kafka Random Partition으로 전송되고, 이벤트의 적재 순서를 보장하지 않습니다. 
+
+구체적인 방식을 살펴본다면 Primary Key를 가리키는 Text 문자열 자체를 Key로 사용하며 본 Key를 기준으로 Hashing & Modulo를 통해 전송할 Kafka Partition을 결정합니다.
+```json
+{
+    "id": 933
+}
+```
+
+
 # 결론
 CDC Platform을 개발하여 다음과 같은 효과를 얻을 수 있었습니다.
 
@@ -698,7 +719,8 @@ CDC Platform을 개발하여 다음과 같은 효과를 얻을 수 있었습니�
 
 # CDC & CDC Platform 이야기
 [1] [1편 - CDC Platform 개발](https://hyperconnect.github.io/2021/01/11/cdc-platform.html)  
-[2] [2편 - CDC Sink Platform 개발 : CQRS 패턴의 적용]
+[2] [2편 - CDC Sink Platform 개발 : CQRS 패턴의 적용](https://hyperconnect.github.io/2021/03/22/cdc-sink-platform.html)  
+[3] [3편 - CDC Event Application Consuming : Event Stream Join의 구현]
 
 
 # Reference  
