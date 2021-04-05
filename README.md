@@ -14,6 +14,7 @@ $ cd techblog
 $ bundle install
 $ bundle exec jekyll serve .
 ```
+* 만약 미래 날짜로 포스트를 작성했다면, `bundle exec jekyll serve . --future` 으로 띄우셔야 포스트를 볼 수 있습니다.
 * 생성된 정적 사이트의 HTML/CSS 소스파일 등은 `_site` 디렉토리 아래에서 확인할 수 있습니다.
 
 ## 어떻게 글을 작성하는가
