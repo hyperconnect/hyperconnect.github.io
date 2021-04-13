@@ -108,15 +108,17 @@ Distributed Mode는 Kafka Connect에 대한 확장성 및 내결함성을 제공
 CDC Platform은 이식성을 높이기 위해 Docker 기반으로 패키징하여 구성합니다.
 
 ```dockerfile
-FROM confluentinc/cp-kafka-connect-base:6.1.0
+FROM confluentinc/cp-kafka-connect-base:6.1.1
 
 ENV CONNECT_PLUGIN_PATH="/usr/share/java,/usr/share/confluent-hub-components" \
     CUSTOM_SMT_PATH="/usr/share/java/custom-smt" \
-    CUSTOM_CONNECTOR_MYSQL_PATH="/usr/share/java/custom-connector-mysql"
+    CUSTOM_CONNECTOR_MYSQL_PATH="/usr/share/java/custom-connector-mysql" \
+    CUSTOM_CONNECTOR_SCYLLA_PATH="/usr/share/java/custom-connector-scylla"
 
 
 ARG CONNECT_TRANSFORM_VERSION=1.4.0
-ARG DEBEZIUM_VERSION=1.4.1
+ARG DEBEZIUM_VERSION=1.5.0
+ARG SCYLLA_CDC_VERSION=1.0.0
 
 
 # Download Using confluent-hub
@@ -125,9 +127,12 @@ RUN confluent-hub install --no-prompt confluentinc/connect-transforms:$CONNECT_T
 
 # Download Custom Source Connector
 RUN mkdir $CUSTOM_CONNECTOR_MYSQL_PATH && cd $CUSTOM_CONNECTOR_MYSQL_PATH && \
-    curl -sO https://download.jar-download.com/cache_jars/io.debezium/debezium-connector-mysql/$DEBEZIUM_VERSION.Final/jar_files.zip && \
-    jar xvf jar_files.zip && \
-    rm jar_files.zip
+    curl -sO https://repo1.maven.org/maven2/io/debezium/debezium-connector-mysql/$DEBEZIUM_VERSION.Final/debezium-connector-mysql-$DEBEZIUM_VERSION.Final-plugin.zip && \
+    jar xvf debezium-connector-mysql-$DEBEZIUM_VERSION.Final-plugin.zip && \
+    rm debezium-connector-mysql-$DEBEZIUM_VERSION.Final-plugin.zip
+
+RUN mkdir $CUSTOM_CONNECTOR_SCYLLA_PATH && cd $CUSTOM_CONNECTOR_SCYLLA_PATH && \
+    curl -sO https://repo1.maven.org/maven2/com/scylladb/scylla-cdc-source-connector/$SCYLLA_CDC_VERSION/scylla-cdc-source-connector-$SCYLLA_CDC_VERSION-jar-with-dependencies.jar
 ```
 
 

@@ -57,15 +57,16 @@ Kafka로부터 변경 이벤트를 읽어 다수의 DataSource로 전송하는 F
 CDC Sink Platform은 이식성을 높이기 위해 Docker 기반으로 패키징하여 구성합니다.
 
 ```dockerfile
-FROM confluentinc/cp-kafka-connect-base:6.1.0
+
+FROM confluentinc/cp-kafka-connect-base:6.1.1
 
 ENV CONNECT_PLUGIN_PATH="/usr/share/java,/usr/share/confluent-hub-components" \
     CUSTOM_SMT_PATH="/usr/share/java/custom-smt"
 
 
-ARG DEBEZIUM_VERSION=1.4.1
+ARG DEBEZIUM_VERSION=1.5.0
 ARG CONNECT_TRANSFORM_VERSION=1.4.0
-ARG CONNECT_ELASTICSEARCH_VERSION=11.0.1
+ARG CONNECT_ELASTICSEARCH_VERSION=11.0.3
 
 
 # Download Using confluent-hub
