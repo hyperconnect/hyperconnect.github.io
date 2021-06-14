@@ -42,11 +42,6 @@ header_pages:
 # Google Analytics
 google_analytics: UA-115815318-2
 
-# Disqus
-disqus:
-  shortname: hpcnt-tech
-
-
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
