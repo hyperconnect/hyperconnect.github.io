@@ -725,13 +725,13 @@ CDC Platform을 개발하여 다음과 같은 효과를 얻을 수 있었습니�
 # CDC & CDC Platform 이야기
 [1] [1편 - CDC Platform 개발](https://hyperconnect.github.io/2021/01/11/cdc-platform.html)  
 [2] [2편 - CDC Sink Platform 개발 : CQRS 패턴의 적용](https://hyperconnect.github.io/2021/03/22/cdc-sink-platform.html)  
-[3] [3편 - CDC Event Application Consuming : Event Stream Join의 구현]
+[3] [3편 - CDC Event Application Consuming : Event Stream Join의 구현](https://hyperconnect.github.io/2021/06/21/cdc-event-application-consuming.html)  
 
 
 # Reference  
 
 [1] [Confluent Hub](https://www.confluent.io/hub/)  
-[2] [Kafka Connect Concept](https://docs.confluent.io/5.5.0/connect/concepts.html)  
+[2] [Kafka Connect Concept](https://docs.confluent.io/platform/current/connect/concepts.html)  
 [3] [Kafka Connect REST API](https://docs.confluent.io/platform/current/connect/references/restapi.html)  
 [4] [Amazon RDS Multi-AZ](https://docs.aws.amazon.com/ko_kr/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)  
 [5] [Schema Registry](https://docs.confluent.io/platform/current/schema-registry/index.html)  
