@@ -1,11 +1,11 @@
 ---
 layout: post
-date: 2021-08-01
+date: 2021-09-15
 title: Shell 없는 Container, Live 환경에서 Debugging해보기!
 author: sammie
 tags: kubernetes bottlerocket debug kubectl
 excerpt: Live Pod을 debugging 하기 위해 사용한 kubectl-debug라는 open-source 도구에 대해 소개하고, 이 도구를 Bottlerocket에서 쓰기 위해 패치한 과정을 공유합니다.
-last_modified_at: 2021-08-01
+last_modified_at: 2021-09-15
 ---
 
 안녕하세요, DevOps 팀의 Sammie입니다. 이번 글에서는 필요한 디버그 도구가 없거나, 심지어는 shell이 존재하지 않는 Kubernetes 위의 container를 현재 상태 그대로 디버깅하기 위해 open-source 도구인 kubectl-debug[[1]](https://github.com/aylei/kubectl-debug)를 사용한 경험을 공유합니다. 또한, Hyperconnect에서 운영하는 대부분의 Kubernetes node는 Bottlerocket[[2]](https://aws.amazon.com/bottlerocket/)이라는 Linux 기반 OS를 사용하는데, kubectl-debug를 이 OS 위에서도 정상적으로 실행할 수 있도록 수정한 내용에 대해 소개하려고 합니다.
@@ -32,7 +32,7 @@ Linux의 container는 process의 group이고, 논리적으로 OS의 resource를 
 2. 위에서 만든 이미지를 원하는 Pod에 추가하여 root 권한으로 실행합니다.
 3. 2에서 추가한 새 container는 Pod 내의 다른 container와 몇몇 namespace를 공유하므로 동일 환경에서 디버깅이 가능합니다!
 
-![pod, container and namespace]({{"/assets/2021-08-01-kubectl-debug-on-bottlerocket/00-container-ns.png"}}){: height="250px" .center-image }
+![pod, container and namespace]({{"/assets/2021-09-15-kubectl-debug-on-bottlerocket/00-container-ns.png"}}){: height="250px" .center-image }
 
 물론 2번째 단계를 실행하는 것은 불가능합니다. Pod 내의 container definition을 포함한 대부분의 spec은 immutable[[8]](https://kubernetes.io/docs/concepts/workloads/pods/#pod-update-and-replacement)하므로 한 번 생성된 이후에는 수정 할 수 없습니다. 
 
@@ -57,7 +57,7 @@ Kubernetes와 EKS의 release cycle을 생각해 볼 때, 이 기능을 사용하
 3. 그러면 debug-agent는 kubelet처럼 target container와 동일한 namespace를 가지는 debugging container를 생성합니다. debug-agent Pod은 node의 Docker socket을 mount 하고 있으므로 직접 container를 조작할 수 있습니다.
 4. 이제 debug-agent는 debugging container와의 ssh 연결을 proxying 합니다.
 
-![kubectl-debug]({{"/assets/2021-08-01-kubectl-debug-on-bottlerocket/01-kubectl-debug.png"}}){: height="350px" .center-image }
+![kubectl-debug]({{"/assets/2021-09-15-kubectl-debug-on-bottlerocket/01-kubectl-debug.png"}}){: height="350px" .center-image }
 
 다만, ephemeral container를 사용하는 native kubectl-debug는 kubelet에서 직접 target container와 동일한 namespace를 가지는 debugging container를 생성하는 반면, 이 도구는 별도의 Pod을 띄워 debugging container를 생성한다는 것이 차이점입니다.
 
