@@ -3,7 +3,7 @@ layout: post
 date: 2021-12-06
 title: Global Media Management System 개발
 author: min.k
-tags: media-management-system upload event edge-location
+tags: media-management-system upload event edge-server
 excerpt: 전세계에 위치한 사용자에게 Media Management System을 제공한 사례에 대해 소개합니다
 last_modified_at: 2021-12-06
 ---
@@ -33,7 +33,7 @@ last_modified_at: 2021-12-06
 
 
 # 방식
-Edge Location과 Backbone Network를 활용하여 트래픽 전송을 가속화 합니다. 이를 통해 전세계 각 지역에 위치한 사용자는 Media Management System과의 데이터 전송을 고속으로 수행 할 수 있습니다.
+Edge Server와 Backbone Network를 활용하여 트래픽 전송을 가속화 합니다. 이를 통해 전세계 각 지역에 위치한 사용자는 Media Management System과의 데이터 전송을 고속으로 수행 할 수 있습니다.
 
 ![Media Management System]({{"/assets/2021-12-06-global-media-management-system/media_management_system.png"}})
 
@@ -105,12 +105,12 @@ Media History CDC를 통해 Kafka로 실시간 스트리밍 전송되는 Media H
 SSL/TLS 암호화 통신은 Man-in-the-middle Attack에 취약하여 이를 최대한 방지하기 위한 방법이 필요합니다. 사용하려는 특정 인증서를 고정하는 방식을 [HTTP Public Key Pinning](https://en.wikipedia.org/wiki/HTTP_Public_Key_Pinning) 이라고 하며 이러한 기법을 사용합니다. 이때, Client가 의도하는 인증서가 맞는지 구분하기 위해 서버는 Cert Digest를 제공합니다. Client는 이를 이용하여 본인이 의도하는 인증서가 맞는지 대조합니다. 이를 통해 해커가 만든 사설 인증서인지, 회사 내에서 올바르게 만든 사설 인증서인지 대조하여 검증을 수행할 수 있습니다. Media Management System에서는 사용자 미디어 보안을 위해 HTTP Public Key Pinning 기법을 활용하고 있습니다.
 
 
-# Edge Location & Backbone Network
-Media Management System을 이용하는 다양한 지역의 사용자들에게 일관된 성능을 제공하기 위해 여러 가지 제품을 고려 하였습니다. 사내에서 AWS 제품을 활용하고 있어 AWS 제품에 대해 높은 우선순위를 두어 테스트를 진행하였습니다. AWS Global Accelerator는 내부적으로 AWS Backbone과 Edge Location을 활용하여 트래픽 전송을 가속화합니다. 또한, 통합된 접근 방식을 제공하고 적용이 비교적 간단하여 AWS Global Accelerator을 우선적으로 적용하였습니다. 하지만, AWS Global Accelerator 사용시 P90 이상의 Long tail latency가 지연되는 현상이 있었습니다. 이를 해소하기 위해 전세계 각 지역에 더 많은 Edge Location을 확보하고 있는 Cloudflare를 활용하도록 변경하였고 Long tail latency 지연 문제를 해소할 수 있었습니다.
+# Edge Server & Backbone Network
+Media Management System을 이용하는 다양한 지역의 사용자들에게 일관된 성능을 제공하기 위해 여러 가지 제품을 고려 하였습니다. 사내에서 AWS 제품을 활용하고 있어 AWS 제품에 대해 높은 우선순위를 두어 테스트를 진행하였습니다. AWS Global Accelerator는 내부적으로 AWS Backbone과 Edge Server를 활용하여 트래픽 전송을 가속화합니다. 또한, 통합된 접근 방식을 제공하고 적용이 비교적 간단하여 AWS Global Accelerator을 우선적으로 적용하였습니다. 하지만, AWS Global Accelerator 사용시 P90 이상의 Long tail latency가 지연되는 현상이 있었습니다. 이를 해소하기 위해 전세계 각 지역에 더 많은 Edge Server를 확보하고 있는 Cloudflare를 활용하도록 변경하였고 Long tail latency 지연 문제를 해소할 수 있었습니다.
 
 나아가 정확한 비교를 위해 AWS Global Accelerator가 아닌 Amazon Cloudfront를 사용하여 Cloudflare와 비교 해보았습니다. 하지만 Cloudflare에서 Amazon Cloudfront로 전환시 AWS Global Accelerator와 동일하게 Long tail latency가 지연되는 현상을 확인할 수 있었습니다. 이에 따라 Media Management System에 Cloudflare 적용을 결정하게 되었습니다.
 
-이를 통해 Application에서 측정되는 P99 기준 Long tail latency는 최대 180초에서 1.5초로 11,900% 개선되었습니다. 각 국가 및 지역별 Local Network 상황은 다르며 사용자와 Egde Location까지의 거리가 멀 경우 Network Latency는 큰 편차를 보일 수 있습니다.
+이를 통해 Application에서 측정되는 P99 기준 Long tail latency는 최대 180초에서 1.5초로 11,900% 개선되었습니다. 각 국가 및 지역별 Local Network 상황은 다르며 사용자와 Egde Server까지의 거리가 멀 경우 Network Latency는 큰 편차를 보일 수 있습니다.
 
 
 ## AWS Global Accelerator -> Cloudflare
@@ -125,7 +125,7 @@ Media Management System을 이용하는 다양한 지역의 사용자들에게 �
 Media Management System을 개발하여 다음과 같은 효과를 얻을 수 있었습니다.
 * 각 국가에서 발생하는 Media 요청 현황을 측정 가능하도록 개선
 * 각 국가 및 지역 ISP에서 네트워크 문제가 발생할 경우 Server에서 자체적으로 대응할 수 있도록 개선
-* AWS Edge Location & Backbone -> Cloudflare Edge Location & Backbone 전환, P99 기준 Long tail latency 최대 180초에서 1.5초로 11,900% 개선
+* AWS Edge Server & Backbone -> Cloudflare Edge Server & Backbone 전환, P99 기준 Long tail latency 최대 180초에서 1.5초로 11,900% 개선
 
 
 # Reference
