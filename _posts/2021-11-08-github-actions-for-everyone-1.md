@@ -23,17 +23,17 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "🎉 The job was automatically triggered by a {% raw %}${{ github.event_name }}{% endraw %} event."
+      - run: echo "🐧 This job is now running on a {% raw %}${{ runner.os }}{% endraw %} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is {% raw %}${{ github.ref }}{% endraw %} and your repository is {% raw %}${{ github.repository }}{% endraw %}."
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "💡 The {% raw %}${{ github.repository }}{% endraw %} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          ls {% raw %}${{ github.workspace }}{% endraw %}
+      - run: echo "🍏 This job's status is {% raw %}${{ job.status }}{% endraw %}."
 
 ```
 
@@ -104,14 +104,14 @@ locals {
 
 다행히도, Github Actions는 간단한 YAML 작성을 통해 Docker 컨테이너 위에서 CI/CD 작업을 할 수 있도록 해줍니다. 아래는 job이라는  Workflow의 작업을 Harbor에서 Pull 해 온 `devops/actions/base` 라는 컨테이너 위에서 작업하겠다는 의미입니다.
 
-```YAML
+```yaml
 jobs:
   job:
     container:
       image: harbor.address/devops/actions/base:latest
       credentials:
         username: bot@hpcnt.com
-        password: ${{ secrets.BOT_PASSWORD }}
+        password: {% raw %}${{ secrets.BOT_PASSWORD }}{% endraw %}
     runs-on: ["gprunner", "pool=m5a.large"]
     steps:
       - name: Checkout Repository
@@ -164,7 +164,7 @@ jobs:
       image: harbor.address/devops/actions/base:latest
       credentials:
         username: bot@hpcnt.com
-        password: ${{ secrets.BOT_PASSWORD }}
+        password: {% raw %}${{ secrets.BOT_PASSWORD }}{% endraw %}
     # Service containers to run with `container-job`
     services:
       # Label used to access the service container
