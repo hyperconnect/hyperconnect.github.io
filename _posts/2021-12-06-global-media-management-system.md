@@ -110,7 +110,7 @@ Media Management System을 이용하는 다양한 지역의 사용자들에게 �
 
 나아가 정확한 비교를 위해 AWS Global Accelerator가 아닌 Amazon Cloudfront를 사용하여 Cloudflare와 비교 해보았습니다. 하지만 Cloudflare에서 Amazon Cloudfront로 전환시 AWS Global Accelerator와 동일하게 Long tail latency가 지연되는 현상을 확인할 수 있었습니다. 이에 따라 Media Management System에 Cloudflare 적용을 결정하게 되었습니다.
 
-이를 통해 Application에서 측정되는 P99 기준 Long tail latency는 최대 180초에서 1.5초로 11,900% 개선되었습니다. 각 국가 및 지역별 Local Network 상황은 다르며 사용자와 Egde Server까지의 거리가 멀 경우 Network Latency는 큰 편차를 보일 수 있습니다.
+이를 통해 Application에서 측정되는 P99 기준 Long tail latency는 최대 180초에서 1.5초로 11,900% 개선되었습니다. 각 국가 및 지역별 Local Network 상황은 다르며 사용자와 Edge Server까지의 거리가 멀 경우 Network Latency는 큰 편차를 보일 수 있습니다.
 
 
 ## AWS Global Accelerator -> Cloudflare
