@@ -1,11 +1,11 @@
 ---
 layout: post
-date: 2021-11-27
+date: 2022-01-17
 title: React Native에서 iOS 빌드 퍼포먼스 최적화
 author: matt.y
 tags: react-native iOS pod optimization
 excerpt: React Native에서 iOS 빌드 시 pod 캐시를 이용하여 빌드 최적화한 경험을 소개합니다.
-last_modified_at: 2021-11-27
+last_modified_at: 2022-01-17
 ---
 
 저희 팀은 React Native(이하 RN)로 프로덕트를 만들고 있습니다. RN이 멀티플랫폼 라이브러리이다 보니 iOS와 Android를 동시에 빌드하고 QA를 진행해야 하는 경우가 많았습니다.
@@ -41,7 +41,7 @@ ios_derived_data_path + "/Build/Intermediates.noindex/ArchiveIntermediates/#{SCH
 ```
 
 - ec2 머신에 저장한 pod 캐시
-![pod-cache]({{ "/assets/2021-11-27-rn-ios-build-optimization/pod-cache.png" | absolute_url }})
+![pod-cache]({{ "/assets/2022-01-17-rn-ios-build-optimization/pod-cache.png" | absolute_url }})
 
 이제 빌드할 프로젝트의 pod가 pod 캐시에 존재한다면 캐시를 사용하고 아니라면 새로운 캐시를 생성하는 일만 남았습니다.
 
@@ -103,11 +103,11 @@ Podfile.lock이 달라져 기존의 캐시와 해시값이 다른 경우는 기�
 
 - 개선 이전 빌드 시간
 
-![before-build-time]({{ "/assets/2021-11-27-rn-ios-build-optimization/before-build-time.png" | absolute_url }})
+![before-build-time]({{ "/assets/2022-01-17-rn-ios-build-optimization/before-build-time.png" | absolute_url }})
 
 - 개선 이후 빌드 시간
 
-![after-build-time]({{ "/assets/2021-11-27-rn-ios-build-optimization/after-build-time.png" | absolute_url }})
+![after-build-time]({{ "/assets/2022-01-17-rn-ios-build-optimization/after-build-time.png" | absolute_url }})
 
 저희 팀 같은 경우 서비스를 오픈한지 얼마 되지 않아 Staging, Production을 배포해야 하는 경우가 많았습니다. 그때마다 오랜 시간을 허비하며 빌드를 했었고, 빼놓은 코드가 있다면 다시 오랜 시간을 반복해야 하는 문제점이 있었습니다. 이번 개선을 통해 더 잦은 배포를 할 수 있게 되었습니다.
 
