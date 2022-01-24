@@ -3,7 +3,7 @@ layout: post
 date: 2021-04-26
 title: 비용 효율적인 Click-Through Rate Prediction 모델로 하쿠나 라이브 추천시스템 구축하기
 author: zerry
-tags: machine-learning hakuna gradient-boosting
+tags: machine-learning hakuna gradient-boosting recommender-system
 excerpt: 하쿠나 라이브에 들어가는 추천시스템을 소개합니다.
 ---
 
