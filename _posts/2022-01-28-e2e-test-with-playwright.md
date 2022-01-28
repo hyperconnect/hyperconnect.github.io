@@ -8,17 +8,17 @@ excerpt: Playwright로 E2E 테스트를 도입한 경험을 공유합니다.
 last_modified_at: 2022-01-28
 ---
 
-안녕하세요👋  Epic Studio, CPaaS Web Unit의 Jace 입니다. ()
+안녕하세요👋  Epic Studio, CPaaS Web Unit의 Jace 입니다.
 저희 팀은 Hyperconnect의 축적된 여러 기술들을 이용해서 실시간 Audio/Video Call SDK를 개발하는 일을 하고 있습니다.  
 SDK에서 버그가 발생하면 제품을 사용하는 모든 서비스에 영향을 미치기 때문에, 안정적인 SDK를 제공하는 것을 중요한 목표로 생각하고 있어요.  
 항상 버그가 없는 완벽한 코드를 짤 수 있다면 좋겠지만, ([~~제프 딘이 아니라면~~](https://medium.com/@Dev_Bono/%EC%A0%9C%ED%94%84-%EB%94%98%EC%9D%98-%EC%A7%84%EC%8B%A4-3fbb4e0e1cf5)) 불가능한 일입니다. 그 때문에 많은 개발팀에서 테스트 코드를 작성하고 있는데요. 저희 팀도 마찬가지로 새로운 기능을 구현하면서 코드 베이스가 점점 커졌고, 그만큼 버그가 발생할 확률도 높아졌습니다.  
 
-이번 글에서는 테스트를 도입하게된 배경과 **실시간 Audio/Video Call SDK**라는 도메인에서 어떻게 E2E 테스트를 구축했는지. 그리고 그때 사용한 Playwright에 대해서 간략히 소개합니다.
+이번 글에서는 테스트를 도입하게 된 배경과 **실시간 Audio/Video Call SDK**라는 도메인에서 어떻게 E2E 테스트를 구축했는지, 그리고 그때 사용한 Playwright에 대해서 간략히 소개합니다.
 
 # 1. 멈춰! 버그 멈춰! ✋
-> ~~서울의 한 오피스. 버그 두개가 개발자에서 시비를 겁니다. 버그의 괴롭힘 강도가 세지자, 피해 개발자가 멈추라고 소리칩니다. 멈춰!~~
+> ~~서울의 한 오피스. 버그 두 개가 개발자에서 시비를 겁니다. 버그의 괴롭힘 강도가 세지자, 피해 개발자가 멈추라고 소리칩니다. 멈춰!~~
 
-코드베이스가 커질 수록 버그가 많아지는 건 자연스럽긴 하지만, 버그로 인해, 스프린트. 저희 팀에서 주로 겪었던 문제는 사이드 이펙트와 크로스 브라우징 문제였어요. 테스트 코드로 이 두 가지를 개선하는 것을 목표로 삼았습니다.
+코드베이스가 커질수록 버그가 많아지는 건 자연스럽긴 하지만, 스프린트가 진행될수록 그 수가 점점 부담스러워 졌습니다. 저희 팀에서 주로 겪었던 문제는 사이드 이펙트와 크로스 브라우징 문제였어요. 테스트 코드로 이 두 가지를 개선하는 것을 목표로 삼았습니다.
 
 ## 사이드 이펙트
 
@@ -29,7 +29,7 @@ SDK에서 버그가 발생하면 제품을 사용하는 모든 서비스에 영�
 그림 1. 사이드 이펙트. (이 개발자는 사이드 이펙트를 뚫고 버그를 모두 고칠 수 있을까요). [출처](https://medium.com/swlh/gold-plating-software-products-7bffe427b215)
 {: style="text-align: center; font-style: italic; color: gray;"}
 
-변경한 코드가 예상치 못한 부분에서 문제를 일으킬 수 있는데, 코드베이스가 커지면 이런 문제는 더 자주 발생하고, 예측하기도 더 어렵습니다. 때문에 QA에서는, **“기존 기능들이 문제없이 동작하는지”**, **“예전에 있었던 이슈가 다시 발생하지는 않는지”**를 확인하는 회귀 테스트(Regression Test)를 주기적으로 진행하게됩니다.
+변경한 코드가 예상치 못한 부분에서 문제를 일으킬 수 있는데, 코드베이스가 커지면 이런 문제는 더 자주 발생하고, 예측하기도 더 어렵습니다. 때문에 QA에서는, **“기존 기능들이 문제없이 동작하는지”**, **“예전에 있었던 이슈가 다시 발생하지는 않는지”**를 확인하는 회귀 테스트(Regression Test)를 주기적으로 진행하게 됩니다.
 이 단계에서 발견된 버그는 개발자에게 리포트되고 수정 후에 다시 QA를 거칩니다.
 
 사실, QA 과정 에서라도 버그가 찾아지면 다행이지만, 버그가 QA 과정에서 발견되는 것과 개발 과정에서 발견되는 것은 시간과 비용이 많은 차이가 납니다. 그래서 발견될 수 있는 문제라면, 개발과정에서 발견하고 싶었어요.
@@ -55,16 +55,16 @@ SDK에서 버그가 발생하면 제품을 사용하는 모든 서비스에 영�
 그림 2. 브라우저들. [출처](https://playwright.dev/)
 {: style="text-align: center; font-style: italic; color: gray;"}
 
-WebRTC와 Media를 다루는 프로젝트의 특성상, 다른 프로젝트 보다 더 많은 크로스 브라우징 이슈를 겪었습니다. 대부분의 이런 이슈들은 SDK 코드의 문제가 아니라, 브라우저들간의 다른 구현이 원인이라서 완전히 테스트에 의존할 수 밖에 없습니다.
+WebRTC와 Media를 다루는 프로젝트의 특성상, 다른 프로젝트 보다 더 많은 크로스 브라우징 이슈를 겪었습니다. 대부분의 이런 이슈들은 SDK 코드의 문제가 아니라, 브라우저들 간의 다른 구현이 원인이라서 완전히 테스트에 의존할 수밖에 없습니다.
 
-Hyperconnect Audio/Video Call SDK는 `1:1 Call`과 `Group Call` 두 가지 모드를 지원하는데, 이 두가지 모두를 테스트 해야 합니다. 그러면, `(두가지 모드) 2 * 브라우저 수` 만큼 테스트 하게됩니다. Chrome, Safari, Firefox 만 테스트해도 6번 해야되는 거죠. (실제로 테스트 되는 브라우저는 더 많습니다. 모바일 브라우저 등.)  
-이런 테스트를 코드 변경할 때 마다 하기엔 너무 힘들었어요. 심호흡 한번 하고 테스트를 하거나, 불안한 마음을 가지고 (문제가 없길 바라면서 🙏) 커밋 해야했습니다.
+Hyperconnect Audio/Video Call SDK는 `1:1 Call`과 `Group Call` 두 가지 모드를 지원하는데, 이 두 가지 모두를 테스트 해야 합니다. 그러면, `(두 가지 모드) 2 * 브라우저 수` 만큼 테스트 하게 됩니다. Chrome, Safari, Firefox 만 테스트해도 6번 해야 되는 거죠. (실제로 테스트 되는 브라우저는 더 많습니다. 모바일 브라우저 등.)  
+이런 테스트를 코드 변경할 때마다 하기엔 너무 힘들었어요. 심호흡 한번 하고 테스트를 하거나, 불안한 마음을 가지고 (문제가 없길 바라면서 🙏) 커밋 해야 했습니다.
 이런 문제를 해결하려면, 테스트를 미리 작성하고 그게 여러 브라우저에서 돌도록 테스트 환경을 구성해야 했습니다.
 
 # 2. E2E로 회귀 테스트를 자동화 하자
 
-정리해보면, 목표는 발견할 수 있는 **문제를 미리 발견**하고 **크로스 브라우징 이슈/테스트**를 개선하는 것 입니다.
-이걸 **E2E로 회귀 테스트를 자동화**하는 방법으로 해결하고자 했습니다. 회귀 테스트 케이스를 모두 통과했다면 사이드 이펙트가 없는거고, 그걸 여러 브라우저에서 자동으로 해보면 되니까요.
+정리해보면, 목표는 발견할 수 있는 **문제를 미리 발견**하고 **크로스 브라우징 이슈/테스트**를 개선하는 것입니다.
+이걸 **E2E로 회귀 테스트를 자동화**하는 방법으로 해결하고자 했습니다. 회귀 테스트 케이스를 모두 통과했다면 사이드 이펙트가 없는 거고, 그걸 여러 브라우저에서 자동으로 해보면 되니까요.
 
 <center>
   <img src="/assets/2022-01-28-e2e-test-with-playwright/03-regression-test-case.png" alt="회귀 테스트 케이스" />
@@ -73,7 +73,7 @@ Hyperconnect Audio/Video Call SDK는 `1:1 Call`과 `Group Call` 두 가지 모�
 그림 3. 회귀 테스트 케이스.
 {: style="text-align: center; font-style: italic; color: gray;"}
 
-여기서 말하는 E2E 테스트는 정확히는 SDK **테스트 앱**을 테스트 하는 것 입니다. SDK에 새로운 기능을 개발할 때, 해당 기능을 (QA와 개발자가)테스트 해볼 수 있도록 테스트 앱을 함께 만들고 있고, QA 테스트 케이스도 테스트 앱을 기준으로 작성됩니다.
+여기서 말하는 E2E 테스트는 정확히는 SDK **테스트 앱**을 테스트 하는 것입니다. SDK에 새로운 기능을 개발할 때, 해당 기능을 (QA와 개발자가) 테스트 해볼 수 있도록 테스트 앱을 함께 만들고 있고, QA 테스트 케이스도 테스트 앱을 기준으로 작성됩니다.
 이름 그대로 테스트를 위해 만든 앱이라서, E2E 테스트하기에 무척 적합했습니다. 먼저 복잡한 UI/UX가 없어서, Element Selector가 매우 단순하고, UI가 변경될 일이 잘 없어서 테스트가 깨질 가능성도 낮습니다.
 
 ## E2E 테스트 프레임워크
@@ -82,7 +82,7 @@ Hyperconnect Audio/Video Call SDK는 `1:1 Call`과 `Group Call` 두 가지 모�
   <img src="/assets/2022-01-28-e2e-test-with-playwright/04-test-app.png" alt="테스트앱" />
 </center>
 
-그림 4. Web SDK 테스트 앱을 두개 띄움. 첫 번째 참여자 = Alice, 두 번째 참여자 = Bob
+그림 4. Web SDK 테스트 앱을 두 개 띄움. 첫 번째 참여자 = Alice, 두 번째 참여자 = Bob
 Bob과 Alice가 Audio/Video Call을 한다.
 {: style="text-align: center; font-style: italic; color: gray;"}
 
@@ -97,9 +97,9 @@ Bob과 Alice가 Audio/Video Call을 한다.
 **Then**: Bob은 `REMOTE_AUDIO_VOLUME_CHANGED` 이벤트를 받고, 그 값이 0 보다 크다
 
 
-이걸 E2E 테스트로 구현한다면, 프레임워크는 각각 아래 처럼 동작할 수 있어야 합니다.
+이걸 E2E 테스트로 구현한다면, 프레임워크는 각각 아래처럼 동작할 수 있어야 합니다.
 
-**Given**: 브라우저 탭을 두개 띄움  
+**Given**: 브라우저 탭을 두 개 띄움  
 **When**: 첫 번째 탭을 조작  
 **Then**: 두 번째 탭의 값을 확인
 
@@ -118,7 +118,7 @@ Playwright는 MS에서 만든 오픈소스 웹 테스트, 자동화 라이브러
 ([Next 버전](https://playwright.dev/docs/next/api/class-android)에서는 ADB를 이용한 Android Chrome/WebView도 지원하는 걸로 보입니다)
 
 사실, Playwright 자체는 E2E 테스트 프레임워크가 아닙니다. Puppeteer처럼 브라우저를 컨트롤할 수 있는 API를 제공하는 프로그램이에요. 그래서 테스트를 하려면, Playwright에서 만든 [@playwright/test](https://github.com/microsoft/playwright/tree/main/packages/playwright-test)를 같이 사용해야 합니다.
-[Puppeteer 팀에 MS로 가서 만든게 Playwright](https://www.infoq.com/news/2020/01/playwright-browser-automation/)라고 하는데, Puppeteer와 비교해서는 조금 더 테스트에 특화된 것 같습니다. 크로스 브라우징 테스트가 가능해 졌고, [@playwright/test](https://github.com/microsoft/playwright/tree/main/packages/playwright-test)같은 자체적인 Test runner도 제공하니까요. Puppeteer로 E2E 테스트를 하려면 Jest, Mocha, Chai 같은 Third-party를 붙여야 합니다.
+[Puppeteer 팀에 MS로 가서 만든 게 Playwright](https://www.infoq.com/news/2020/01/playwright-browser-automation/)라고 하는데, Puppeteer와 비교해서는 조금 더 테스트에 특화된 것 같습니다. 크로스 브라우징 테스트가 가능해졌고, [@playwright/test](https://github.com/microsoft/playwright/tree/main/packages/playwright-test)같은 자체적인 Test runner도 제공하니까요. Puppeteer로 E2E 테스트를 하려면 Jest, Mocha, Chai 같은 Third-party를 붙여야 합니다.
 
 이제 Playwright로 테스트 코드를 어떻게 작성할 수 있는지 알아봅시다. [문서가 정말 잘되어 있어서](https://playwright.dev/docs/intro), 자세한 기능이나 API에 대한 설명은 하지 않았습니다. 테스트 케이스를 어떻게 Playwright 코드로 옮겼는지를 중점으로 봐주시면 좋을 것 같습니다.
 
@@ -134,7 +134,7 @@ $ npm i -D @playwright/test
 $ npx playwright install
 ```
 
-설치 후에 Config 파일을 작성합니다. 어느 브라우저에서 테스트를 할건지 여기서 설정합니다.
+설치 후에 Config 파일을 작성합니다. 어느 브라우저에서 테스트를 할 건지 여기서 설정합니다.
 
 `playwright.config.ts`
 
@@ -169,13 +169,13 @@ const config: PlaywrightTestConfig = {
 
 
 ## 테스트 코드: Hello world
-(지금 여기) Hyperconnect 기술블로그 를 대상으로 몇가지 테스트를 작성해봅시다.
+(지금 여기) Hyperconnect 기술 블로그를 대상으로 몇가지 테스트를 작성해봅시다.
 아래 네 가지 케이스를 E2E로 작성해 봤어요. 마지막 네 번째 케이스는 일부러 실패하는 케이스를 넣었습니다. 
 
 1. document title이 올바르다
 2. footer의 copyright가 올바르다
 3. 채용정보 버튼을 누르면, Career 페이지로 이동한다
-4. 배경을 100번 클릭하면, dark theme으로 바뀐다. (100번 클릭해도 dark theme 안됩니다)
+4. 배경을 100번 클릭하면, dark theme으로 바뀐다 (100번 클릭해도 dark theme 안됩니다)
 
 `tech-blog.test.ts`
 ```typescript
@@ -185,7 +185,7 @@ import { expect, Page, test } from '@playwright/test';
 test.describe('하이퍼커넥트 기술블로그 테스트', () => {
   let page: Page;
 
-  // beforeAll hook은 최초 딱 한번 실행. initialize 작업등을 수행
+  // beforeAll hook은 최초 딱 한번 실행. initialize 작업 등을 수행
   test.beforeAll(async ({ browser, contextOptions }) => {
     const browserContext = await browser.newContext(contextOptions);
     // 페이지 생성
@@ -267,7 +267,7 @@ test.describe('하이퍼커넥트 기술블로그 테스트', () => {
 그림 6. tech-blog.test.ts 실행 결과
 {: style="text-align: center; font-style: italic; color: gray;"}
 
-작성한 테스트 케이스 4개 * 브라우저 3개 = 12개의 테스트가 실행되었습니다. 그 중 9개 성공했고, 일부러 실패하도록 작성한 케이스 3개가 실패했습니다. 테스트가 실패하는 경우 어떤 케이스의 어떤 Assertion 구문이 왜 실패했는지 보여줍니다. 
+작성한 테스트 케이스 4개 * 브라우저 3개 = 12개의 테스트가 실행되었습니다. 그중 9개 성공했고, 일부러 실패하도록 작성한 케이스 3개가 실패했습니다. 테스트가 실패하는 경우 어떤 케이스의 어떤 Assertion 구문이 왜 실패했는지 보여줍니다. 
 실패한 4. 배경을 100번 클릭하면, dark theme으로 바뀐다 케이스는 background-color 가
 Expected: `black` 이지만,
 Received: `rgb(253, 253, 253)` 이라서 실패했다고 친절하게 알려주고 있습니다.
@@ -289,13 +289,13 @@ let pages: [Page, Page];
 test.beforeAll(async ({ browser, contextOptions }) => {
   browserContext = await browser.newContext(contextOptions);
 
-  // 제일 먼저, 브라우저 탭 두개를 생성한다
+  // 제일 먼저, 브라우저 탭 두 개를 생성한다
   pages = await Promise.all([
     browserContext.newPage(), // Alice
     browserContext.newPage(), // Bob
   ]);
  
-  // User token 생성등의 initialize 작업
+  // User token 생성 등의 initialize 작업
   await control.readyPages({ pages });
 });
 ```
@@ -356,7 +356,7 @@ test('Remote Video가 표시된다', async () => {
 **Then**: Bob은 `remote-user-left` 이벤트를 받는다
 
 ```typescript
-test('상대방이 나갈경우 remote-user-left 이벤트를 받는다', async () => {
+test('상대방이 나갈 경우 remote-user-left 이벤트를 받는다', async () => {
     // Alice가 room에서 leave 한다
     await control.leaveRoom(pages[0]);
 
@@ -378,18 +378,18 @@ test('상대방이 나갈경우 remote-user-left 이벤트를 받는다', async 
 그림 7. WebKit 카메라 권한 요청 팝업
 {: style="text-align: center; font-style: italic; color: gray;"}
 
-Playwright에서 WebKit과 Firefox는 [카메라와 마이크 권한을 가져오지 못하는 이슈](https://github.com/microsoft/playwright/issues/7635)가 있었습니다. 이 문제를 해결하기 위해 카메라와 마이크를 Mocking 했는데, 그 방법을 간단히 소개드릴게요.
+Playwright에서 WebKit과 Firefox는 [카메라와 마이크 권한을 가져오지 못하는 이슈](https://github.com/microsoft/playwright/issues/7635)가 있었습니다. 이 문제를 해결하기 위해 카메라와 마이크를 Mocking 했는데, 그 방법을 간단히 소개 해드릴게요.
  
 Playwright는 `context.grantPermissions(['camera', 'microphone']);` 으로 권한을 가져오는데, Webkit과 Firefox에서는 `Unknown permission: microphone` 에러가 발생했습니다.
-위 이슈 때문에, Playwright 말고 [NightWatch](https://nightwatchjs.org/)나 [TestCafe](https://testcafe.io/)등 다른 E2E 프레임워크도 써봤는데, 같은 문제가 있었어요.
+위 이슈 때문에, Playwright 말고 [NightWatch](https://nightwatchjs.org/)나 [TestCafe](https://testcafe.io/) 등 다른 E2E 프레임워크도 써봤는데, 같은 문제가 있었어요.
 결국 다시 Playwright로 돌아와서 문제를 해결할 workaround를 고민해 봤습니다.
 
 
 - CI 환경에서는 카메라와 마이크가 없다
-- (어찌 됐든) Video와 Audio가 상대방에게 전달되서, 테스트 케이스를 통과하기만 하면 된다
+- (어찌 됐든) Video와 Audio가 상대방에게 전달돼서, 테스트 케이스를 통과하기만 하면 된다
 
 이런 근거를 가지고, 카메라/마이크를 사용하는 부분을 Mocking 해보기로 했습니다.
-카메라와 마이크에 접근하는 `navigator.mediaDevices.getUserMedia`를 overwrite 해서 카메라와 마이크 권한 없이도, Video / Audio Stream을 제공한다는 아이디어 입니다. (아래 코드 참고)
+카메라와 마이크에 접근하는 `navigator.mediaDevices.getUserMedia`를 overwrite 해서 카메라와 마이크 권한 없이도, Video / Audio Stream을 제공한다는 아이디어입니다. (아래 코드 참고)
 
 ```typescript
 // 기존 내장 getUserMedia 함수 overwrite
@@ -413,10 +413,10 @@ navigator.mediaDevices.getUserMedia = (constraints?: MediaStreamConstraints) => 
 ```
 
 <br/>
-우선 결과를 미리 공유 드릴게요. overwrite한 `getUserMedia` 으로 동작하는 테스트앱 영상입니다. Video는 4*4 픽셀마다 랜덤한 색상을 가지도록 구현했고, Audio는 (반짝 반짝 작은별) 노래를 계속 연주하도록 구현했습니다.
+우선 결과를 미리 공유 드릴게요. overwrite한 `getUserMedia` 으로 동작하는 테스트앱 영상입니다. Video는 4*4 픽셀마다 랜덤한 색상을 가지도록 구현했고, Audio는 (반짝반짝 작은 별) 노래를 계속 연주하도록 구현했습니다.
 
 <center>
-  <video src="/assets/2022-01-28-e2e-test-with-playwright/08-mock-stream.mp4" alt="Mocking Stream 영상" controls />
+  <video src="/assets/2022-01-28-e2e-test-with-playwright/08-mock-stream.mp4" style="max-width: 100%;" alt="Mocking Stream 영상" controls />
 </center>
 
 Mocking한 Video / Audio Track
@@ -424,7 +424,7 @@ Mocking한 Video / Audio Track
 
 
 ## Video Track Mocking
-Video Track은 canvas로 구현했습니다. `canvas.captureStram()` 을 사용하면 video track이 포함된 Stream을 얻을 수 있고 Canvas를 업데이트 할때 마다, 해당 Stream에 반영 됩니다.
+Video Track은 canvas로 구현했습니다. `canvas.captureStram()` 을 사용하면 video track이 포함된 Stream을 얻을 수 있고 Canvas를 업데이트 할 때마다, 해당 Stream에 반영됩니다.
 0.5초 마다, 4*4 크기의 사각형이 랜덤한 색상을 가지도록 구현했어요.
 
 ```typescript
@@ -460,7 +460,7 @@ export function getMockVideoStreamTrack(width: number = 100, height: number = 10
 ```
 
 ## Audio Track Mocking
-Audio Track은 [Audio API](https://developer.mozilla.org/ko/docs/Web/API/Web_Audio_API)를 사용해서 구현했어요. `createMediaStreamDestination()` 으로 Stream을 생성하고, Oscillator를 이용해서 Stream에 Audio가 발생하도록 구현하면 됩니다. 저는 “작은별”을 계속 연주하도록 했습니다. 주파수 별로, 계이름을 매핑해두고, 계이름으로 악보 Array를 만들어서 재생하도록 했어요. 코드로 음악 연주했던 재밌는 경험이었습니다.
+Audio Track은 [Audio API](https://developer.mozilla.org/ko/docs/Web/API/Web_Audio_API)를 사용해서 구현했어요. `createMediaStreamDestination()` 으로 Stream을 생성하고, Oscillator를 이용해서 Stream에 Audio가 발생하도록 구현하면 됩니다. 저는 “작은 별”을 계속 연주하도록 했습니다. 주파수 별로, 계이름을 매핑해두고, 계이름으로 악보 Array를 만들어서 재생하도록 했어요. 코드로 음악 연주했던 재밌는 경험이었습니다.
 
 ```typescript
 export function getMockAudioStreamTrack(): MediaStreamTrack {
@@ -557,7 +557,7 @@ if (process.env.HCE_USE_MOCK_STREAM) {
 }
 ```
 
-여기까지 하고 나면, 브라우저가 카메라/마이크 권한을 요청하지 않고, 이미 권한을 허용 해둔 것 처럼 동작합니다 🙌. 덕분에 WebKit, Firefox 뿐만 아니라, CI 환경에서도 카메라/마이크 문제없이 테스트 케이스가 통과하게 되었습니다.
+여기까지 하고 나면, 브라우저가 카메라/마이크 권한을 요청하지 않고, 이미 권한을 허용 해둔 것처럼 동작합니다 🙌. 덕분에 WebKit, Firefox 뿐만 아니라, CI 환경에서도 카메라/마이크 문제없이 테스트 케이스가 통과하게 되었습니다.
 
 
 # 5. 마치며
@@ -569,12 +569,12 @@ if (process.env.HCE_USE_MOCK_STREAM) {
 그림 8. E2E 테스트가 실패했을 때
 {: style="text-align: center; font-style: italic; color: gray;"}
 
-지금까지, E2E 테스트를 도입해서 버그를 멈추려고 노력했던 과정에 대해 다루어 보았습니다. E2E나 Playwright 도입을 고려중이신 분들께 도움이 됐으면 좋겠습니다. (~~E2E 테스트 도입하면서 버그한테 열심히 멈추라고 하니까 조금 멈췄습니다~~)
+지금까지, E2E 테스트를 도입해서 버그를 멈추려고 노력했던 과정에 대해 다루어 보았습니다. E2E나 Playwright 도입을 고려 중이신 분들께 도움이 됐으면 좋겠습니다. (~~E2E 테스트 도입하면서 버그한테 열심히 멈추라고 하니까 조금 멈췄습니다~~)
 
 지금은 Github Actions 사용해서 PR을 올리면, E2E 테스트가 자동으로 돕니다. 테스트에 실패하면 Merge 할 수 없도록 정책을 유지하고 있고, 덕분에 버그와 배포할 때 불안한 마음이 줄어들었습니다.
 
-몇가지 한계나 개선할 점이 있기는 합니다.
-1. 모든 테스트 케이스를 자동화 할 수 는 없음 (OS나 하드웨어 관련된 부분)- 
+몇 가지 한계나 개선할 점이 있기는 합니다.
+1. 모든 테스트 케이스를 자동화할 수는 없음 (OS나 하드웨어 관련된 부분)- 
     - 네트워크 연결을 끊기 / 다시 연결하기
     - 새로운 Audio Input Device 연결하기
     - 연결했던 Audio Input Device 제거하기
@@ -582,8 +582,10 @@ if (process.env.HCE_USE_MOCK_STREAM) {
     - 이 부분은 [BrowserStack에 Playwright](https://www.browserstack.com/docs/automate/playwright)를 연동하는 방법을 생각하고 있습니다
 
 
-마지막으로 저희가 채용 중 이라는 소식을 전하면서 글을 마칩니다.  
-🙌 [채용공고 바로가기](https://career.hyperconnect.com/jobs/) 🙌
+마지막으로 저희가 채용 중이라는 소식을 전하면서 글을 마칩니다.
+
+🙌 [Hyperconnect 채용공고 바로가기](https://career.hyperconnect.com/jobs/) 🙌  
+🚀 [CPaaS Web Frontend Software Engineer 채용공고 바로가기](https://career.hyperconnect.com/job/6616a4f0-5689-44d9-885e-e5d403e7cbe4) 🚀
 
 ## Reference
 [https://medium.com/@Dev_Bono/제프-딘의-진실-3fbb4e0e1cf5](https://medium.com/@Dev_Bono/%EC%A0%9C%ED%94%84-%EB%94%98%EC%9D%98-%EC%A7%84%EC%8B%A4-3fbb4e0e1cf5)
