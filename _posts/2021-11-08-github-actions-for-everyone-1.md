@@ -185,7 +185,7 @@ jobs:
 
 # References
 
-[1] [https://docs.github.com/en/actions/quickstart]({{https://docs.github.com/en/actions/quickstart}})
+[1] [https://docs.github.com/en/actions/quickstart](https://docs.github.com/en/actions/quickstart)
 
 [2] [https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions](https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions)
 
