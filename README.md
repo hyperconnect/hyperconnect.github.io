@@ -62,17 +62,8 @@ GitHub Pages only supports kramdown as a Markdown processor.
 
 GitHub-flavored Markdown is supported by kramdown by default, so you can use Markdown with GitHub Pages the same way you use Markdown on GitHub.
 ```
-6. GitHub Pages가 tag 처리에 필요한 플러그인을 지원하지 않아 workaround가 필요합니다. post 작성을 완료했으면 `tag_generator.py` 스크립트를 실행하여 tag를 생성해야 합니다. 아래는 실행 예입니다.
-```
-$ ./tag_generator.py
-('filename: ', '_posts/2018-06-13-android-secure-db-howto.md')
-('filename: ', '_posts/2018-06-03-android-secure-sharedpref-howto.md')
-('filename: ', '_posts/2018-04-17-hypercut.md')
-('filename: ', '_posts/2018-03-27-android-time-conversion.md')
-('Tags generated, count', 8)
-$
-```
-7. 혹시 모를 일을 대비하기 위해 `master` 직접 푸시는 막아 두었습니다. 적당한 브랜치를 만들고 `master` 를 향해 Pull request 를 만들어 주세요!
+
+6. 혹시 모를 일을 대비하기 위해 `master` 직접 푸시는 막아 두었습니다. 적당한 브랜치를 만들고 `master` 를 향해 Pull request 를 만들어 주세요!
 
 ## 이미지 붙이는 법
 
