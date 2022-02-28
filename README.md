@@ -17,6 +17,12 @@ $ bundle exec jekyll serve .
 * 만약 미래 날짜로 포스트를 작성했다면, `bundle exec jekyll serve . --future` 으로 띄우셔야 포스트를 볼 수 있습니다.
 * 생성된 정적 사이트의 HTML/CSS 소스파일 등은 `_site` 디렉토리 아래에서 확인할 수 있습니다.
 
+* 혹은, Docker를 이용하면 컴퓨터에 의존성을 설치할 필요 없이 간편하게 로컬 서버를 띄워 볼 수 있습니다.
+
+```
+$ docker run --rm -it -v "$PWD:/srv/jekyll" -p 4000:4000 jekyll/jekyll jekyll serve
+```
+
 ## 어떻게 글을 작성하는가
 
 * jekyll 의 설정은 매우 방대해서 필요한 것을 하나씩 찾아보며 할 수밖에 없습니다.
