@@ -1,6 +1,6 @@
 ---
 layout: post
-date: 2022-02-21
+date: 2022-03-02
 title: 제목은 React Native 도입이라고 하겠습니다. 근데 이제 Hakuna 앱에 곁들여진
 author: easton
 tags: react-native iOS android
@@ -29,18 +29,18 @@ Webview는 네트워크를 통해서 서버를 거쳐 로딩하기 때문에 페
 
 <ul style="display: flex; justify-content: space-between; list-style: none; margin: 0 auto; padding: 0; max-width: 640px;">
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-02-28-embedded-react-native/webview-level-page.gif" style="width: 220px; height: 480px;" alt="webview" />
+        <img src="/assets/2022-03-02-embedded-react-native/webview-level-page.gif" style="width: 220px; height: 480px;" alt="webview" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">Webview</p>
     </li> 
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-02-28-embedded-react-native/react-native-level-page.gif" style="width: 220px; height: 480px;" alt="react-native" />
+        <img src="/assets/2022-03-02-embedded-react-native/react-native-level-page.gif" style="width: 220px; height: 480px;" alt="react-native" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">React Native</p>
     </li>
 </ul>
 
 **2. CodePush 📲**
 
-![CodePush](/assets/2022-02-28-embedded-react-native/codepush.png)
+![CodePush](/assets/2022-03-02-embedded-react-native/codepush.png)
 그림 1. CodePush [출처](https://www.google.com/url?sa=i&url=https%3A%2F%2Fmedium.com%2Fhumanscape-tech%2Freact-native-code-push%25EB%25A1%259C-%25EB%25B0%25B0%25ED%258F%25AC%25ED%2595%2598%25EA%25B8%25B0-26b320d87f8&psig=AOvVaw16_oGTmN4_t2wHZLLVeL0z&ust=1645144012484000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCJCis5e9hfYCFQAAAAAdAAAAABAJ)
 {: style="text-align: center; font-style: italic; color: gray;"}
 
@@ -56,7 +56,7 @@ Javascript Bundle을 갱신할 때 CodePush를 통하여 실시간으로 업데�
 
 # Flutter vs React Native
 
-![flutter-vs-rn](/assets/2022-02-28-embedded-react-native/flutter-vs-rn.png)
+![flutter-vs-rn](/assets/2022-03-02-embedded-react-native/flutter-vs-rn.png)
 그림 3. Flutter vs React-native [출처](https://blog.wishket.com/wp-content/uploads/2021/10/02.png)
 {: style="text-align: center; font-style: italic; color: gray;"}
 
