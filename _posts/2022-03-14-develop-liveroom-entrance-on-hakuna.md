@@ -1,6 +1,6 @@
 ---
 layout: post
-date: 2022-03-02
+date: 2022-03-14
 title: 하쿠나 입장 API 개선하기 - 괴물 API 리팩토링과 성능개선하기
 author: karol
 tags: testing refactoring
@@ -9,13 +9,13 @@ excerpt: 하쿠나의 괴물 API 중 하나인 입장 API 개선 feature를 진�
 
 <!-- 이미지 좀 더 괜찮은거 없으려나 -->
 
-![liveroom_hakuna_logo]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_hakuna_logo.png"}}){: height="150px" .center-image }
+![liveroom_hakuna_logo]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_hakuna_logo.png"}}){: height="150px" .center-image }
 
 안녕하세요. 하이퍼커넥트 하쿠나 스튜디오 Backend 팀의 Karol입니다. 최근 저희 팀에서는 팀의 오랜 숙원이었던 `입장 API`를 리팩토링하고 성능을 개선하는 작업을 진행했었는데요. 이번 글을 통하여 이 가장 오래된 레거시 중 하나였고, 성능상 치명적이었던 `입장 API`을 어떤 식으로 개선하였는지, 그리고 어떤 결과를 얻었는지 공유드리고자 합니다.
 
 # 하쿠나 간단 소개와 백엔드 팀이 가지는 과제
 
-![liveroom_hakuna]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_hakuna.png"}}){: height="300px" .center-image }
+![liveroom_hakuna]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_hakuna.png"}}){: height="300px" .center-image }
 
 먼저 간단하게 하쿠나는 어떤 서비스인지 설명드리고 개발팀에서 달성해야하는 목표를 설명드리려고 합니다. 저희 서비스는 여러분들이 익히 아시는 트x치, 아xx카TV와 같은 **소셜 라이브 스트리밍 서비스**입니다. 소셜 라이브 스트리밍 서비스에서는 실시간으로 사용자간의 다양한 상호작용이 일어납니다. 이를 위해 저희 backend 팀에서는 아래와 같은 주요 목표를 세우고 개발에 임하고 있습니다. 
 
@@ -38,11 +38,11 @@ excerpt: 하쿠나의 괴물 API 중 하나인 입장 API 개선 feature를 진�
 
 <ul style="display: flex; justify-content: space-between; list-style: none; margin: 0 auto; padding: 0; max-width: 960px;">
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_asis_1.png" style="width: 480px; height: 220px;" alt="liveroom_asis_1" />
+        <img src="/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_asis_1.png" style="width: 480px; height: 220px;" alt="liveroom_asis_1" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">avg 그래프</p>
     </li> 
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_asis_2.png" style="width: 480px; height: 220px;" alt="liveroom_asis_2" />
+        <img src="/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_asis_2.png" style="width: 480px; height: 220px;" alt="liveroom_asis_2" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">p95 그래프</p>
     </li>
 </ul>
@@ -93,11 +93,11 @@ excerpt: 하쿠나의 괴물 API 중 하나인 입장 API 개선 feature를 진�
 
 <ul style="display: flex; justify-content: space-between; list-style: none; margin: 0 auto; padding: 0; max-width: 960px;">
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_analize_1.png" style="width: 480px; height: 220px;" alt="liveroom_analize_1" />
+        <img src="/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_analize_1.png" style="width: 480px; height: 220px;" alt="liveroom_analize_1" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">throughput</p>
     </li> 
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_analize_2.png" style="width: 360px;" alt="liveroom_analize_2" />
+        <img src="/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_analize_2.png" style="width: 360px;" alt="liveroom_analize_2" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">APM에 나온 JPA의 N + 1</p>
     </li>
 </ul>
@@ -108,7 +108,7 @@ excerpt: 하쿠나의 괴물 API 중 하나인 입장 API 개선 feature를 진�
 
 <!-- 요건 약간 보안적인 부분도 걸린다.. 줄좀 그어야할듯? -->
 
-![liveroom_analize_3](/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_analize_3.png)
+![liveroom_analize_3](/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_analize_3.png)
 
 ## 리팩토링하기
 
@@ -177,7 +177,7 @@ fun validateAndPublishEvent(liveRoomId: Long, userId: Long) {
 
 아래 이미지를 보시면 Intellij를 통해서 리팩토링 할 수 있는 목록들입니다. 자주 사용하는 리팩토링 방법들은 단축키를 외워두시면 더 빠르게 진행할 수 있습니다.
 
-![liveroom_extract_method_1](/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_extract_method_1.png)
+![liveroom_extract_method_1](/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_extract_method_1.png)
 
 ```kotlin
 private fun validateAndPublishEvent(liveRoomId: Long, userId: Long) {
@@ -215,7 +215,7 @@ JPA에서 N + 1이 어떤 현상인지 간단히 말씀드리면 **테이블간 
 
 굉장히 심플한 로직입니다. 논리적으로 문제는 없고, 실제로도 의도한 결과를 제공합니다. 하지만 2번에서 루프를 순환을하며 Redis에 한건씩 조회하는 것은 데이터의 규모 N이 커질 경우 문제가 될 수 있습니다. 모두가 알고 있는 것처럼 Redis는 상당히 빠른 인메모리 시스템입니다. 진짜 빠릅니다. [벤치마킹](https://redis.io/topics/benchmarks)에 따르면 100Byte key-value 기준 초당 10만 명령어도 처리할 수 있다고합니다. **하지만 실제 서비스에서 레디스에 도달히기 위한 네트워크 전송은 결코 빠르지 않다라는 사실을 잊어버리면 안됩니다. N이 100이라고하면 200번의 네트워크 전송이 있는 것입니다.** 
 
-![liveroom_n_plus_one_2]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_n_plus_one_2.png"}}){: height="300px" .center-image }
+![liveroom_n_plus_one_2]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_n_plus_one_2.png"}}){: height="300px" .center-image }
 
 이유를 알았으니 해결 방법은 간단합니다. **해결 방법은 순환하지 않고 한번에 데이터를 가져온 후 CPU 자원을 이용하여 어플리케이션 내부에서 매핑하는 것입니다.** 그렇다면 로직은 아래처럼 변경될 것입니다.
 
@@ -224,7 +224,7 @@ JPA에서 N + 1이 어떤 현상인지 간단히 말씀드리면 **테이블간 
 3. 두 데이터 집합을 Map으로 만듭니다.
 4. 더 작은 데이터 집합을 순회하며 상대방 데이터 집합에서 데이터를 매핑합니다.
 
-![liveroom_n_plus_one_3]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_n_plus_one_3.png"}}){: height="300px" .center-image }
+![liveroom_n_plus_one_3]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_n_plus_one_3.png"}}){: height="300px" .center-image }
 
 ### 동기적으로 처리할 부분과 비동기적으로 처리할 이벤트 나누기
 
@@ -232,13 +232,13 @@ JPA에서 N + 1이 어떤 현상인지 간단히 말씀드리면 **테이블간 
 
 이 괴물 API는 아쉽게도 이런 부분이 고려가 잘 되어있지 않았고 모든 로직이 동기적으로 이루어지고 있었습니다. 간단히 보여드리면 아래와 같은 API는 아래와 같은 flow을 가지고 있었습니다. 동기적으로 순차 처리가 되기 때문에 유저는 아래 모든 로직이 완료되기 전에는 응답을 받을 수 없습니다.
 
-![liveroom_async_1]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_async_1.png"}}){: height="300px" .center-image }
+![liveroom_async_1]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_async_1.png"}}){: height="300px" .center-image }
 
 따라서 로직을 아래와 같이 변경하였습니다. 실제로 입장 API에 반드시 필요한 로직을 제외한 로직은 비동기적으로 처리될 수 있도록 하였습니다. 이렇게 변경함으로써 성능적 향상 뿐만 아니라 입장 API는 입장이라는 핵심 기능에만 집중할 수 있도록 처리하여 이후의 유지보수에도 좋은 영향을 줄 수 있습니다. 
 
 추가적으로 `입장 한 방의 정보를 업데이트 하고 해당 방의 유저들에게 전달` 로직은 이벤트 처리 로직으로 빠른 시간내에 입장인원이 많아지면 동일한 비즈니스로직이 여러번 실행되게 됩니다. 이렇게 중복적으로 로직이 처리되는 로직에 대해서 [`debouncing`](https://levelup.gitconnected.com/debounce-in-javascript-improve-your-applications-performance-5b01855e086) 적용하는 작업도 진행을 하였습니다.
 
-![liveroom_async_2]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_async_2.png"}}){: height="300px" .center-image }
+![liveroom_async_2]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_async_2.png"}}){: height="300px" .center-image }
 
 ## 괴물 API와의 사투 끝에 얻어낸 결과
 
@@ -246,18 +246,18 @@ JPA에서 N + 1이 어떤 현상인지 간단히 말씀드리면 **테이블간 
 
 <ul style="display: flex; justify-content: space-between; list-style: none; margin: 0 auto; padding: 0; max-width: 960px;">
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_tobe_1.png" style="width: 480px; height: 220px;" alt="liveroom_tobe_1" />
+        <img src="/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_tobe_1.png" style="width: 480px; height: 220px;" alt="liveroom_tobe_1" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">avg 그래프</p>
     </li> 
     <li style="display: flex; flex-direction: column;">
-        <img src="/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_tobe_2.png" style="width: 480px; height: 220px;" alt="liveroom_tobe_2" />
+        <img src="/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_tobe_2.png" style="width: 480px; height: 220px;" alt="liveroom_tobe_2" />
         <p style="font-weight: bold; margin-top: 8px; text-align: center;">p95 그래프</p>
     </li>
 </ul>
 
 성능적 향상만 놓고 봤을 때, **동일 API에 대해서 Latency의 평균, p95 모두 대략 85% 가량 성능 개선** 되었습니다. 
 
-![liveroom_tobe_3]({{"/assets/2022-03-02-develop-liveroom-entrance-on-hakuna-1/liveroom_tobe_3.png"}}){: height="300px" .center-image }
+![liveroom_tobe_3]({{"/assets/2022-03-14-develop-liveroom-entrance-on-hakuna-1/liveroom_tobe_3.png"}}){: height="300px" .center-image }
 
 그리고 추가적으로 위의 그래프는 p99 그래프 입니다. 이 그래프는 스파이크 등을 분석하여 API의 안정성을 확인해줍니다. 이 그래프를 보았을 때 스파이크가 없다라는 것이 확인이 되어집니다. 이를 통해 **안정성 또한 개선**되었다고 판단할 수 있습니다.
 
