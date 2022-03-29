@@ -1,13 +1,13 @@
 ---
 layout: post
-date: 2022-02-25
+date: 2022-03-29
 title: Temporal Knowledge Distillation for On-device Audio Classification
 author: jake.m
 tags: machine-learning deep-learning on-device audio-classification knowledge-distillation transformer
 excerpt: Overview for our paper, "Temporal Knowledge Distillation For On-Device Audio Classification (ICASSP 2022)".
 ---
 
-| ![Temporal KD Method]({{"/assets/2022-02-25-temporal-kd-ondevice-audio/fig1_method.png"}}){: width="100%" } |
+| ![Temporal KD Method]({{"/assets/2022-03-29-temporal-kd-ondevice-audio/fig1_method.png"}}){: width="100%" } |
 |:--:| 
 | Fig. 1. Illustration of our proposed model, more details below. |
 
@@ -31,20 +31,20 @@ Our paper is the first to introduce a new method that distills temporal informat
 ### May I have your attention please
 The idea is to use the student latent encodings with high dimensionally in the temporal domain, we call this the student context representations. For example, we can use the CNN feature map before the global average pooling layer. We introduce an attention mechanism to the student model during training time that acts as a conduit to distill the teacher’s attentions into the student model. The student’s attention mechanism can be discarded during deployment and inference time. To establish temporal correspondence between the student and teacher, a 1-D temporal attention representation is generated. We achieve this by using attention rollout [(1)](#references) to aggregate the teacher’s multi-layer transformer attentions and use simple linear interpolation to be distilled into the student through the auxiliary attention KD loss. The final objective is a weighted combination of the task loss and the auxiliary attention KD loss. The auxiliary KD loss, Kullback-Leibler (KL) divergence loss, enforces that the attention weights of the student and teacher to be aligned, as shown in Fig. 2.
 
-| ![Logit distribution]({{"/assets/2022-02-25-temporal-kd-ondevice-audio/fig2_attentions.png"}}){: width="100%" } |
+| ![Logit distribution]({{"/assets/2022-03-29-temporal-kd-ondevice-audio/fig2_attentions.png"}}){: width="100%" } |
 |:--:| 
 | Fig. 2. Visualization of attention weights extracted from multiple models. We input an arbitrary sample from the Noisy Speech Commands v2 dataset with 8 seconds noise. We plot the location of the one second keyword to all the plots. |
 
 ### Evaluation Results
 To demonstrate the effectiveness of the attention distillation on audio classification, we evaluated on audio event classification and long sequence keyword spotting (KWS). Our teacher transformer is wav2vec 2.0 [(4)](#references) fine-tuned on the audio classification tasks. We evaluated our method on several common lightweight on-device KWS models, which served as the students.  For audio event classification, we trained and evaluated on the FSD50K dataset [(3)](#references). We found our method improved the on-device model’s mAP scores up to 25.3% compared with no KD applied (Table 1). 
 
-|![FSD50K]({{"/assets/2022-02-25-temporal-kd-ondevice-audio/tbl1_model_scores.png"}}){: width="80%" } |
+|![FSD50K]({{"/assets/2022-03-29-temporal-kd-ondevice-audio/tbl1_model_scores.png"}}){: width="80%" } |
 |:--:| 
 | Table 1. Performance comparison on the FSD50K dataset. Test mAP of the best model found by the validation is reported. |
 
 Interestingly, we found that the KWS dataset, Google’s Speech Commands v2 [(2)](#references), is trivial even for the lightest models. This is due to the simple 1-second utterances the dataset contains. We introduced a new dataset by mixing the keywords in noise of varying durations to increase the level of difficulty and to illustrate the importance of our temporal distillation method.  Our method improved and in some cases outperformed the large teacher transformer in the KWS task (Table 2).
 
-| ![Speech Command V2]({{"/assets/2022-02-25-temporal-kd-ondevice-audio/tbl2_audio_legnth_scores.png"}}){: width="80%" } |
+| ![Speech Command V2]({{"/assets/2022-03-29-temporal-kd-ondevice-audio/tbl2_audio_legnth_scores.png"}}){: width="80%" } |
 |:--:| 
 | Table 2. Performance comparison on Noisy Speech Commands v2 dataset. Test accuracy (%) of the best model found by the validation accuracy is reported. Best accuracies are in bold, and the performance of the student models that outperform the teacher model is underlined. |
 
