@@ -1,6 +1,6 @@
 ---
 layout: post
-date: 2022-04-25
+date: 2022-04-19
 title: Tuist를 활용한 하쿠나 iOS 프로젝트 모듈화 적용하기
 author: wick
 tags: iOS module
@@ -20,7 +20,7 @@ excerpt: 하쿠나 iOS 프로젝트 모듈화를 진행했던 경험을 소개�
 - 앞으로 계획과 마무리
 
 # Tuist란?
-![tuist]({{ "/assets/2022-04-25-ios-modularization/tuist.gif" }}){: .center-image }
+![tuist]({{ "/assets/2022-04-19-ios-modularization/tuist.gif" }}){: .center-image }
 
 Tuist는 XcodeGen과 더불어 Xcode 프로젝트 파일의 생성및 관리할 수 있는 도구 입니다. XcodeGen은 프로젝트 설정을 YML로 관리 하는 반면에 Tuist는 Swift 언어로 관리할 수 었어 iOS 개발자라면 어렵지 않게 프로젝트 설정을 할 수 있습니다. 
 
@@ -43,11 +43,11 @@ Tuist는 XcodeGen과 더불어 Xcode 프로젝트 파일의 생성및 관리할 
 
 모듈 측면에서 확인해보면 아래의 이미지와 같습니다.
 
-![before_diagram]({{ "/assets/2022-04-25-ios-modularization/before_diagram.png" }}){: height="300px" .center-image }
+![before_diagram]({{ "/assets/2022-04-19-ios-modularization/before_diagram.png" }}){: height="300px" .center-image }
 
 하나의 **App** 모듈에 **Util**, **Resource**, **API**, **CommonUI**, **Feature**의 성격인 코드들이 모두 포함되어 있어 결합도가 높은 상황임을 알 수 있습니다.
 
-![before_file]({{ "/assets/2022-04-25-ios-modularization/before_file.png" }}){: height="300px" .center-image }
+![before_file]({{ "/assets/2022-04-19-ios-modularization/before_file.png" }}){: height="300px" .center-image }
 
 파일배치 측면에서는 단순 형태 기준으로 파일들이 배치되어 있음을 확인 할 수 있었습니다. 그래서 평소 신규 기능 개발을 위해 파일을 어디에다 추가하면 좋을지 고민하는 시간이 종종 있었습니다. 🥲
 
@@ -130,7 +130,7 @@ Tuist를 사용해서 4가지의 모듈을 정의 했습니다. 각 모듈에 �
 
 ## 1차 모듈작업 결과
 
-![1phase_result]({{ "/assets/2022-04-25-ios-modularization/1phase_result.png" }}){: .center-image }
+![1phase_result]({{ "/assets/2022-04-19-ios-modularization/1phase_result.png" }}){: .center-image }
 
 하나의 App 모듈에서 **Util**, **API**, **Resource**, **CommonUI**로 모듈로 분리가 되었지만, 모듈간 의존성이 남아 결합도가 남아 있는 상황입니다. 그래도 모듈을 정의하고 각 모듈에 맞는 파일, 코드들을 분리해 배치 했다는데 의미가 있었습니다. 
 
@@ -166,20 +166,20 @@ API에서도 Resource를 사용하고 있었습니다. Hakuna 에서는 Swagger 
 유저 스토리별 파일 구분 작업은 주로 App, CommonUI모듈에서 작업 되었습니다. 
 기존 App 모듈에서는 파일 구분을 단지 형태별로 구분지어 아래와 같이 사용하고 있었습니다. 
 
-![App_file_before]({{ "/assets/2022-04-25-ios-modularization/App_file_before.png" }}){: .center-image }
+![App_file_before]({{ "/assets/2022-04-19-ios-modularization/App_file_before.png" }}){: .center-image }
 
 이렇게 형태별로 사용하면서 프로젝트가 비대해지고 팀 구성원이 늘어나게 되면서 한 그룹에 많은 파일들이 배치되게 되면서 파일 찾기가 힘들어지고, 신규 기능 작업시 어디에 파일을 추가해야 좋을지 고민하는 시간이 늘어나게 되는 상황이였습니다.
 그래서 파일들을 유저 스토리별로 구분지어 이런 어려움을 해결하고자 했습니다. 유저 스토리별로 파일 구분은 아래와 같이 진행 되었습니다.
 
-![App_file_after]({{ "/assets/2022-04-25-ios-modularization/App_file_after.png" }}){: .center-image }
+![App_file_after]({{ "/assets/2022-04-19-ios-modularization/App_file_after.png" }}){: .center-image }
 
 CommonUI의 경우 1차 작업시에는 파일 구분이 없어서 파일을 찾기가 힘들었었습니다. 그래서 UI컴포넌트 별로 구분하게 되었고 아래와 같이 진행 되었습니다.
 
-![CommonUI_file_result]({{ "/assets/2022-04-25-ios-modularization/CommonUI_file_result.png" }}){: .center-image }
+![CommonUI_file_result]({{ "/assets/2022-04-19-ios-modularization/CommonUI_file_result.png" }}){: .center-image }
 
 ## 2차 모듈작업 결과
 
-![2phase_result]({{ "/assets/2022-04-25-ios-modularization/2phase_result.png" }}){: .center-image }
+![2phase_result]({{ "/assets/2022-04-19-ios-modularization/2phase_result.png" }}){: .center-image }
 
 모듈화 적용전 하나의 App모듈인 상황보다 많은 개선이 이루어졌습니다. 하지만 모듈화 작업은 아직 많이 남았다고 생각합니다. (화이팅 💪)
 모듈내 파일들을 유저 스토리 별로 분리하고 나서는 파일을 찾거나 어떤 새로운 작업을 시작하려고 할때 망설임 없이 파일을 찾을 수 있고, 어디에 파일을 추가할지 명확하게 할 수 있어 만족감이 좋았습니다. 😀 유저 스토리별로 파일을 구분짓는 작업은 앞으로 진행하게될 유저스토리별로 빌드가 가능하게하는 목표에 초석이 될 것으로 생각합니다.😎
