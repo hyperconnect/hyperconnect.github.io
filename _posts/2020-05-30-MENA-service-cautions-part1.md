@@ -63,7 +63,7 @@ LTR 과 RTL 표기법으로 본 위키피디아 화면. 글자 뿐 아니라 그
 
 오른쪽부터 글을 써 내려가는 방식이 상당히 낯설다 생각하실 분도 계실 지 모르겠습니다. 하지만, 우리도 불과 100년 전까지만 해도 RTL 국가였습니다. 아래 그림을 볼까요?
 
-![독립신문]({{ "/assets/MENA-service-cautions/독립신문-464x600.jpg" | absolute_url }}){: .center-image }
+![독립신문]({{ "/assets/MENA-service-cautions/dongnip-sinmun-464x600.jpg" | absolute_url }}){: .center-image }
 독립신문 창간호
 {: style="font-size: 80%; text-align: center;"}
 
