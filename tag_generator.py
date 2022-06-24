@@ -10,7 +10,7 @@ No plugins required.
 
 import glob
 import os
-
+import os.path
 
 def tag_generator(post_dir, tag_dir):
     filenames = glob.glob(post_dir + '*md')
@@ -44,7 +44,10 @@ def tag_generator(post_dir, tag_dir):
         os.makedirs(tag_dir)
 
     for tag in total_tags:
-        tag_filename = tag_dir + tag + '.md'
+        tag_filename = tag_dir + tag.lower() + '.md'
+        if os.path.isfile(tag_filename):
+            print(f"{tag} 대소문자 중복")
+            exit(1)
         f = open(tag_filename, 'a')
         write_str = f'---\nlayout: tagpage\ntitle: \"Tag: {tag}\"\ntag: {tag}\nrobots: noindex\n---\n'
         f.write(write_str)

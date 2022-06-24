@@ -3,7 +3,7 @@ layout: post
 date: 2022-04-19
 title: AWS 대회 2관왕한 사람이 푸는 우승 Know-Hows
 author: james.b
-tags: security AWS Gameday ctf 
+tags: security aws Gameday ctf 
 excerpt: AWS Gameday 에 참가해 우승했던 후기를 공유합니다.
 last_modified_at: 2022-04-19
 ---
