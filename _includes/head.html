@@ -40,6 +40,10 @@
   {% else %}
   <meta property="og:description" content="{{ site.description }}" />
   {% endif %}
+  {% if page.cover_image %}
+  <meta property="og:image" content="{{ page.cover_image | absolute_url }}" />
+  {% else %}
   <meta property="og:image" content="{{ "/assets/favicon.jpg" | absolute_url }}" />
+  {% endif %}
   <meta property="og:url" content="{{ site.url }}{{ page.url }}" />
 </head>

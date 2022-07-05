@@ -5,6 +5,7 @@ title: 이벤트 기반의 라이브 스트리밍 추천 시스템 운용하기
 author: owen.l
 tags: machine-learning recommender-system event microservice
 excerpt: 마이크로서비스 아키텍처와 이벤트 주도 아키텍처로 구현된 라이브 스트리밍 추천 시스템을 소개합니다.
+cover_image: "/assets/2022-01-24-event-driven-recsys/cover.jpg"
 last_modified_at: 2022-01-24
 ---
 
