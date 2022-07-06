@@ -1,6 +1,6 @@
 ---
 layout: post
-date: 2022-07-07
+date: 2022-07-06
 title: Junior 개발자의 글로벌 서비스 경험기 1탄
 author: tay, mason
 authors:
@@ -24,13 +24,13 @@ excerpt: 아자르 Android팀의 주니어 개발자들의 글로벌 서비스 �
 ### Toast 대응
 아래는 아자르에서 상대방과 매치중 상대방으로 부터 친구 추가를 받은 화면입니다. 이 화면에서 어떠한 문제점이 있는지 보이시나요?
 
-![toast_os12_kr]({{"/assets/2022-07-07-azar-android-junior-developer-view/toast_os12_kr.jpg" | absolute_url}}){: width="300px" }
+![toast_os12_kr]({{"/assets/2022-07-06-azar-android-junior-developer-view/toast_os12_kr.jpg" | absolute_url}}){: width="300px" }
 
 맞습니다. 한국어에서는 문제가 없습니다 ! 😂
 
 그렇다면 포루투갈어에서는 어떨까요?
 
-![toast_os12_pt]({{"/assets/2022-07-07-azar-android-junior-developer-view/toast_os12_pt.jpg" | absolute_url}}){: width="300px" }
+![toast_os12_pt]({{"/assets/2022-07-06-azar-android-junior-developer-view/toast_os12_pt.jpg" | absolute_url}}){: width="300px" }
 
 맞습니다. 토스트에 있는 문자열을 보시면 말줄임이 된 것을 보실 수 있습니다. (~~물론 저는 1개 국어도 제대로 못하기 때문에 포르투갈어로 말줄임이 되든 안되든 무슨 말인지는 모릅니다..!~~ 😂)
 
@@ -64,7 +64,7 @@ excerpt: 아자르 Android팀의 주니어 개발자들의 글로벌 서비스 �
 
 |한국어 스낵바|포르투갈어 스낵바|
 |---------|------------|
-|![snackbar_os12_kr]({{"/assets/2022-07-07-azar-android-junior-developer-view/snackbar_os12_kr.jpg" | absolute_url}})|![snackbar_os12_kr]({{"/assets/2022-07-07-azar-android-junior-developer-view/snackbar_os12_pt.jpg" | absolute_url}})|
+|![snackbar_os12_kr]({{"/assets/2022-07-06-azar-android-junior-developer-view/snackbar_os12_kr.jpg" | absolute_url}})|![snackbar_os12_kr]({{"/assets/2022-07-06-azar-android-junior-developer-view/snackbar_os12_pt.jpg" | absolute_url}})|
 
 간단하게 언어별로 문자열 길이가 달라지면서 발생했던 Toast 노출 문제에 대해서 이야기했는데요. 다음으로는 TextView에서 발생할 수 있는 문제에 대해 이야기를 해보도록 하겠습니다.
 
@@ -120,7 +120,7 @@ Tay는 디자이너가 요구한 대로 TextView를 만들었습니다. MVVM 구
 
 `autoSizeMaxTextSize`, `autoSizeMinTextSize`, `autoSizeTextType` 을 지정하고 나면 아래와 같이 문자열이 길어질 경우 textSize가 조절이 되는 것을 확인할 수 있습니다.
 
-![text_autosize_sample]({{"/assets/2022-07-07-azar-android-junior-developer-view/text_autosize.jpg" | absolute_url}}){: width="300px" }
+![text_autosize_sample]({{"/assets/2022-07-06-azar-android-junior-developer-view/text_autosize.jpg" | absolute_url}}){: width="300px" }
 
 이러한 경험을 토대로 Azar 를 만들어가는 개발자, 디자이너, PM 등 구성원은 이와 같이 언어별로 문자열의 길이가 다르다는 것을 인지하고 간단한 텍스트를 노출할 때에도 auto sizing 처리가 필요하진 않은지, 필요하다면 어느 범위까지 축소시키며 노출할 것인지 등을 고민하고 있습니다.<br>
 또한, 개발하면서 아자르가 지원하는 23개 모든 언어를 다 테스트할 필요까지는 없다고 하더라도, 가장 긴 러시아어와 RTL이 적용되는 아랍어로 바꿔서 보는 것이 팁이라면 팁이기도 합니다.
@@ -131,7 +131,7 @@ Tay는 디자이너가 요구한 대로 TextView를 만들었습니다. MVVM 구
 국가별 string 대응은 글로벌 서비스의 기본 요건입니다. 아자르는 현재 23개 언어에 대해 번역을 지원하고 있는데요. 안드로이드 스튜디오에서 아래와 같이 국가별 리소스 디렉토리를 생성해서 대응이 가능합니다.
 
 |---------|---------|
-|![add_string_android]({{"/assets/2022-07-07-azar-android-junior-developer-view/add_string_android.png" | absolute_url}}){: width="500px" }|![add_string_result_android]({{"/assets/2022-07-07-azar-android-junior-developer-view/add_string_result_android.png" | absolute_url}}){: width="650px" }|
+|![add_string_android]({{"/assets/2022-07-06-azar-android-junior-developer-view/add_string_android.png" | absolute_url}}){: width="500px" }|![add_string_result_android]({{"/assets/2022-07-06-azar-android-junior-developer-view/add_string_result_android.png" | absolute_url}}){: width="650px" }|
 
 ### 번역 프로세스
 
