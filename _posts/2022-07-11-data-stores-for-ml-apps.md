@@ -5,6 +5,7 @@ title: 머신러닝 어플리케이션을 위한 데이터 저장소 기술
 author: owen.l
 tags: machine-learning data-store
 excerpt: 머신러닝 어플리케이션의 데이터 사용 패턴을 분석하고, 데이터 사용 패턴에 적합한 데이터 저장소엔 어떠한 것들이 있는지에 대해서 소개합니다.
+cover_image: "/assets/2022-07-11-data-stores-for-ml-apps/cover.png"
 last_modified_at: 2022-07-11
 ---
 
