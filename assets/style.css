@@ -140,3 +140,7 @@ pre, code {
     margin: 0 auto;
     display: block;
 }
+
+.top-image {
+    vertical-align: top;
+}

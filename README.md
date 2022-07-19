@@ -10,9 +10,8 @@
 
 ```
 $ gem install jekyll bundler
-$ cd techblog
 $ bundle install
-$ bundle exec jekyll serve .
+$ bundle exec jekyll serve . --incremental
 ```
 * 만약 미래 날짜로 포스트를 작성했다면, `bundle exec jekyll serve . --future` 으로 띄우셔야 포스트를 볼 수 있습니다.
 * 생성된 정적 사이트의 HTML/CSS 소스파일 등은 `_site` 디렉토리 아래에서 확인할 수 있습니다.
@@ -22,6 +21,18 @@ $ bundle exec jekyll serve .
 ```
 $ docker run --rm -it -v "$PWD:/srv/jekyll" -p 4000:4000 jekyll/jekyll jekyll serve
 ```
+
+### openssl error during bundle install?
+1. brew info openssl
+   ```shell
+   $ brew info openssl
+   openssl@3: stable 3.0.3 (bottled) [keg-only]
+   ...
+   For compilers to find openssl@3 you may need to set:
+     export LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib"
+     export CPPFLAGS="-I/opt/homebrew/opt/openssl@3/include" # <-
+   ```
+2. gem install eventmachine -v '<event-machine-version>' -- --with-cppflags=-I/opt/homebrew/opt/openssl@3/include
 
 ## 어떻게 글을 작성하는가
 
