@@ -1,11 +1,11 @@
 ---
 layout: post
-date: 2023-01-02
+date: 2022-12-30
 title: 글로벌 라이브 스트리밍을 지탱하는 하이퍼커넥트 미디어 서버 인프라를 소개합니다
 author: simon.y
 tags: media-server infra webrtc
 excerpt: 하이퍼커넥트의 글로벌 라이브 스트리밍 플랫폼 서비스의 기반이 되는 미디어 서버 인프라를 구조적인 측면에서 소개합니다.
-last_modified_at: 2023-01-02
+last_modified_at: 2022-12-30
 ---
 
 안녕하세요, 하이퍼커넥트 Media Lab의 Media Server Team에서 Media Server Engineer로 일하고 있는 Simon.Y 입니다.\
@@ -36,7 +36,7 @@ WebRTC 기술을 조금 더 자세하게 알고 싶으신 분은 페이지 아�
 
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/01-peerconnection.png" | absolute_url}}' alt='그림 1. Alice와 Bob은 시그널링 서버를 통해 세션정보를 교환하여 맺은 PeerConnection으로 서로 연결되어 있다.'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/01-peerconnection.png" | absolute_url}}' alt='그림 1. Alice와 Bob은 시그널링 서버를 통해 세션정보를 교환하여 맺은 PeerConnection으로 서로 연결되어 있다.'>
   <figcaption>그림 1. Alice와 Bob은 시그널링 서버를 통해 세션정보를 교환하여 맺은 PeerConnection으로 서로 연결되어 있다.</figcaption>
 </figure>
 
@@ -70,7 +70,7 @@ HLS는 널리 퍼진 기술이라는 장점이 있으나 호스트가 미디어�
 다음과 같이 Alice의 라이브를 Bob, Charlie, David, Eve가 시청하는 상황을 가정해봅시다.
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/02-p2p.png" | absolute_url}}' alt='그림 2. Alice와 Bob, Alice와 Charlie, Alice와 David, Alice와 Eve가 서로 각각 PeerConnection을 맺어 Alice의 라이브를 시청하고 있다.'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/02-p2p.png" | absolute_url}}' alt='그림 2. Alice와 Bob, Alice와 Charlie, Alice와 David, Alice와 Eve가 서로 각각 PeerConnection을 맺어 Alice의 라이브를 시청하고 있다.'>
   <figcaption>그림 2. Alice와 Bob, Alice와 Charlie, Alice와 David, Alice와 Eve가 서로 각각 PeerConnection을 맺어 Alice의 라이브를 시청하고 있다.</figcaption>
 </figure>
 
@@ -89,7 +89,7 @@ HLS는 널리 퍼진 기술이라는 장점이 있으나 호스트가 미디어�
 
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/03-media-server.png" | absolute_url}}' alt='그림 3. Alice는 라이브를 미디어 서버로 송신하고, Bob, Charlie, David, Eve는 미디어 서버를 통해 Alice의 라이브를 수신하고 있다.'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/03-media-server.png" | absolute_url}}' alt='그림 3. Alice는 라이브를 미디어 서버로 송신하고, Bob, Charlie, David, Eve는 미디어 서버를 통해 Alice의 라이브를 수신하고 있다.'>
   <figcaption>그림 3. Alice는 라이브를 미디어 서버로 송신하고, Bob, Charlie, David, Eve는 미디어 서버를 통해 Alice의 라이브를 수신하고 있다.</figcaption>
 </figure>
 
@@ -118,7 +118,7 @@ SFU 이외에도 다양한 종류의 미디어 서버들이 있는데 조금 더
 
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/04-simple-horizontal-media-server.png" | absolute_url}}' alt='그림 4. 가장 단순한 수평 확장 전략을 사용하여 구성된 미디어 서버 인프라를 통해 Alice와 Bob이 라이브를 하고, Charlie, David, Eve, Frank가 라이브를 시청하고 있다.'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/04-simple-horizontal-media-server.png" | absolute_url}}' alt='그림 4. 가장 단순한 수평 확장 전략을 사용하여 구성된 미디어 서버 인프라를 통해 Alice와 Bob이 라이브를 하고, Charlie, David, Eve, Frank가 라이브를 시청하고 있다.'>
   <figcaption>그림 4. 가장 단순한 수평 확장 전략을 사용하여 구성된 미디어 서버 인프라를 통해 Alice와 Bob이 라이브를 하고, Charlie, David, Eve, Frank가 라이브를 시청하고 있다.</figcaption>
 </figure>
 
@@ -154,7 +154,7 @@ Media Server Broker는 호스트에게는 라이브를 위한 적절한 미디�
 그러므로 좀 더 스마트한 수평 확장 구조를 생각해야 합니다.
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/05-origin-edge-media-server.png" | absolute_url}}' alt='그림 5. Origin-Edge 구조로 구성된 미디어 서버 인프라를 통해 Alice의 라이브를 Charlie, David, Eve가 시청하고 있고, Bob의 라이브를 Frank가 시청하고 있다.'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/05-origin-edge-media-server.png" | absolute_url}}' alt='그림 5. Origin-Edge 구조로 구성된 미디어 서버 인프라를 통해 Alice의 라이브를 Charlie, David, Eve가 시청하고 있고, Bob의 라이브를 Frank가 시청하고 있다.'>
   <figcaption>그림 5. Origin-Edge 구조로 구성된 미디어 서버 인프라를 통해 Alice의 라이브를 Charlie, David, Eve가 시청하고 있고, Bob의 라이브를 Frank가 시청하고 있다.</figcaption>
 </figure>
 
@@ -181,7 +181,7 @@ Media Server Broker는 호스트에게는 라이브를 위한 적절한 미디�
 하이퍼커넥트에서는 글로벌 저지연 라이브 스트리밍 서비스를 제공하기 위해 클라우드 서비스를 이용하여 세계 각지에 미디어 서버 인프라를 두고 있습니다.
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/06-global-cloud.png" | absolute_url}}' alt='그림 6. Amazon Web Service의 글로벌 인프라를 활용하여 라이브 스트리밍 플랫폼을 전세계를 대상으로 서비스하고 있습니다. (AWS 글로벌 인프라 홈페이지에서 갈무리)'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/06-global-cloud.png" | absolute_url}}' alt='그림 6. Amazon Web Service의 글로벌 인프라를 활용하여 라이브 스트리밍 플랫폼을 전세계를 대상으로 서비스하고 있습니다. (AWS 글로벌 인프라 홈페이지에서 갈무리)'>
   <figcaption>그림 6. Amazon Web Service의 글로벌 인프라를 활용하여 라이브 스트리밍 플랫폼을 전세계를 대상으로 서비스하고 있습니다. (출처: AWS)</figcaption>
 </figure>
 
@@ -194,7 +194,7 @@ Media Server Broker는 호스트에게는 라이브를 위한 적절한 미디�
 따라서 미디어 서버 인프라를 글로벌로 확장할 때 조금 더 좋은 전략을 고민할 필요가 있습니다.
 
 <figure style="text-align: center;">
-  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2023-01-02-introduction-to-media-server/07-global-media-server.png" | absolute_url}}' alt='그림 7. 글로벌로 확장된 미디어 서버 인프라를 통해 미국에 있는 Alice의 라이브를 한국에 있는 Eve가 안정적으로 시청할 수 있다.'>
+  <img style="display: block; margin: 0 auto;" data-action="zoom" src='{{"/assets/2022-12-30-introduction-to-media-server/07-global-media-server.png" | absolute_url}}' alt='그림 7. 글로벌로 확장된 미디어 서버 인프라를 통해 미국에 있는 Alice의 라이브를 한국에 있는 Eve가 안정적으로 시청할 수 있다.'>
   <figcaption>그림 7. 글로벌로 확장된 미디어 서버 인프라를 통해 미국에 있는 Alice의 라이브를 한국에 있는 Eve가 안정적으로 시청할 수 있다.</figcaption>
 </figure>
 
