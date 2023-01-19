@@ -22,7 +22,8 @@ $ bundle exec jekyll serve . --incremental
 $ docker run --rm -it -v "$PWD:/srv/jekyll" -p 4000:4000 jekyll/jekyll jekyll serve
 ```
 
-### openssl error during bundle install?
+### Troubleshooting
+#### openssl error during bundle install?
 1. brew info openssl
    ```shell
    $ brew info openssl
@@ -33,6 +34,9 @@ $ docker run --rm -it -v "$PWD:/srv/jekyll" -p 4000:4000 jekyll/jekyll jekyll se
      export CPPFLAGS="-I/opt/homebrew/opt/openssl@3/include" # <-
    ```
 2. gem install eventmachine -v '<event-machine-version>' -- --with-cppflags=-I/opt/homebrew/opt/openssl@3/include
+
+#### `chown: _site: Read-only file system` (when using docker run)
+1. Try `rm -rf .cache .jekyll-cache .sass-cache _site`
 
 ## 어떻게 글을 작성하는가
 
