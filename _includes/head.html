@@ -3,7 +3,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {%- seo -%}
-  <link rel="icon" href="{{ "/assets/favicon.ico" | relative_url }}" type="image/x-icon">
+  <link rel="icon" href="{{ "/assets/favicon.svg" | relative_url }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
   {%- feed_meta -%}
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
@@ -22,7 +22,7 @@
   {% else %}
   <meta name="twitter:description" content="{{ site.description }}" />
   {% endif %}
-  <meta name="twitter:image" content="{{ "/assets/favicon.jpg" | absolute_url }}" />
+  <meta name="twitter:image" content="{{ "/assets/opengraph_default_image.jpg" | absolute_url }}" />
 
   <!-- Facebook Open Graph -->
   {% if page.title %}
@@ -43,7 +43,7 @@
   {% if page.cover_image %}
   <meta property="og:image" content="{{ page.cover_image | absolute_url }}" />
   {% else %}
-  <meta property="og:image" content="{{ "/assets/favicon.jpg" | absolute_url }}" />
+  <meta property="og:image" content="{{ "/assets/opengraph_default_image.jpg" | absolute_url }}" />
   {% endif %}
   <meta property="og:url" content="{{ site.url }}{{ page.url }}" />
 </head>
