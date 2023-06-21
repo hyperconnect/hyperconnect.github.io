@@ -222,3 +222,7 @@ tanukee:
     name: Lee, Gunjun
     username: gunjunlee
     email: tanukee@hpcnt.com
+devrel:
+    name: DevRel Team
+    username: hyperconnect
+    email: devrel@hpcnt.com
