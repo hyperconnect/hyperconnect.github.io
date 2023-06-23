@@ -1,3 +1,13 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+$content-width:    960px;
+
+@import
+  "minima/skins/{{ site.minima.skin | default: 'classic' }}",
+  "minima/initialize";
+
 @import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
 
 .post-title {

@@ -24,9 +24,10 @@ github_username: hyperconnect
 
 # Build settings
 markdown: kramdown
-theme: minima
+remote_theme: jekyll/minima@2863624b903b17f838d6ce8d2f77900fa9d3c864
 highlighter: rouge
 plugins:
+  - jekyll-remote-theme
   - jekyll-feed
   - jekyll-avatar
   - jekyll-sitemap
@@ -40,7 +41,7 @@ header_pages:
   - about.md
 
 # Google Analytics
-google_analytics: UA-115815318-2
+google_analytics: G-00HF5X8PV7
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
