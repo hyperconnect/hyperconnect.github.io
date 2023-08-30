@@ -1,0 +1,24 @@
+{%- assign post = include.post -%}
+{%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+<li>
+    <h3>
+        <a class="post-link" href="{{ post.url | relative_url }}">
+        {{ post.title | escape }}
+        </a>
+    </h3>
+    <div class="post-meta">
+        {% include author.html post=post avatar_size=30 include_email=false %}
+        <time>{{ post.date | date: date_format }}</time>
+    </div>
+    {%- if site.show_excerpts -%}
+    <div class="post-excerpt">{{ post.excerpt }}</div>
+    {%- endif -%}
+    <div>
+        <span class="tags">
+        {% for tag in post.tags %}
+        {% capture tag_name %}{{ tag }}{% endcapture %}
+        <a href="/tag/{{ tag_name }}"><span class="tag">{{ tag_name }}</tag></a>
+        {% endfor %}
+        </span>
+    </div>
+</li>

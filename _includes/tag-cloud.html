@@ -1,12 +1,16 @@
 <h2>Tags</h2>
 {% capture temptags %}
   {% for tag in site.tags %}
-    {{ tag[1].size | plus: 1000 }}#{{ tag[0] }}#{{ tag[1].size }}
+    {{ tag[1].size | plus: 10000 }}#{{ tag[0] }}#{{ tag[1].size }}
   {% endfor %}
 {% endcapture %}
 {% assign sortedtemptags = temptags | split:' ' | sort | reverse %}
 {% for temptag in sortedtemptags %}
   {% assign tagitems = temptag | split: '#' %}
   {% capture tagname %}{{ tagitems[1] }}{% endcapture %}
-  <a href="/tag/{{ tagname }}"><code class="highligher-rouge"><nobr>{{ tagname }}</nobr></code></a>
+  {% assign article_num = tagitems[0] | to_integer | minus: 10000 %}
+
+  {% if article_num > 1 %}
+  <a href="/tag/{{ tagname }}"><span class="tag">{{ tagname }} ({{ article_num }})</span></a>
+  {% endif %}
 {% endfor %}

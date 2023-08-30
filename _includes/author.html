@@ -1,0 +1,32 @@
+{% assign post = include.post %}
+{% assign include_email = include.include_email %}
+{% assign avatar_size = include.avatar_size %}
+
+{%- if post.authors -%}
+    <span class="multiple-authors">
+        <span>
+        {%- for author_id in post.authors -%}
+            {% assign author = site.data.authors[author_id] %}
+            {% avatar user=author.username size={{avatar_size}} %}
+        {%- endfor -%}
+        </span>
+        <span class="author" itemprop="name">
+        {%- for author_id in post.authors -%}
+            {% assign author = site.data.authors[author_id] %}
+            {{ author.name }}{% if forloop.last == false %}, {% endif %}
+        {%- endfor -%}
+        </span>
+    </span>
+{%- elsif post.author -%}
+    <span class="single-author">
+        {% assign author = site.data.authors[post.author] %}
+        {%- if author.username  -%}
+            {% avatar user=author.username size={{avatar_size}} %}
+        {%- endif -%}
+        {%- if include_email -%}
+        <span class="author" itemprop="name">{{ author.name }} ({{ author.email }})</span>
+        {%- else -%}
+        <span class="author" itemprop="name">{{ author.name }}</span>
+        {%- endif -%}
+    </span>
+{%- endif -%}

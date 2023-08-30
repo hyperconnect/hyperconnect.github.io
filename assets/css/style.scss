@@ -8,26 +8,55 @@ $content-width:    960px;
   "minima/skins/{{ site.minima.skin | default: 'classic' }}",
   "minima/initialize";
 
-@import url(//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins');
+
+body {
+    font-family: 'Pretendard', 'sans-serif';
+}
+
+.site-header {
+    font-family: 'Poppins', 'sans-serif';
+    border-top: none !important;
+    border-bottom: none !important;
+    height: 60px;
+    line-height: 60px;
+}
+
+.post-header::before {
+    display: none !important;
+}
 
 .post-title {
-    font-size: 32px;
+    font-size: 35px;
     font-weight: 700;
     color: #222;
-    margin-bottom: 6px;
-}
-.post-meta {
-    color: #777;
     margin-bottom: 20px;
 }
-.post-meta > time {
-    padding-right: 4px;
+
+.tag {
+    display: inline-block;
+    padding: 5px 8px !important;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    color: #707070;
+    font-size: 13px;
+    line-height: 13px;
+    text-decoration: none;
 }
-.post-meta > span {
-    padding-left: 4px;
+.tag::before {
+    display: inline-block;
+    content: '#';
+    color: #aaa;
+    margin-right: 1px;
 }
+
+a .tag:hover{
+    color: #444;
+}
+
 .post-header {
-    margin-top: 50px;
+    margin-top: 40px;
 }
 .post-header:before {
     display: block;
@@ -38,9 +67,46 @@ $content-width:    960px;
     content: ' ';
     position: relative;
 }
+
+.post-header .post-meta {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+    
+}
+.post-header .post-meta > p {
+    margin: 0 0 5px 0;
+    padding: 0;
+    color: #777;
+    font-size: 14px;
+}
+.post-header .post-meta time {
+    padding-right: 4px;
+}
+.post-header .post-meta span {
+    padding-left: 4px;
+}
+
+.post-meta .single-author .avatar {
+    margin-right: 8px;
+}
+.post-meta .multiple-authors .avatar {
+    margin-right: 2px;
+}
+.post-meta .multiple-authors .avatar:last-child {
+    margin-right: 8px;
+}
+.post-meta .author {
+    color: #5f5f5f;
+    font-weight: 500;
+    margin-right: 5px;
+}
+
+
 .site-title span {
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 600;
+    color: black;
 }
 .site-title img {
     height: 42px;
@@ -50,40 +116,100 @@ $content-width:    960px;
 .post-list-header > * {
     display:inline;
 }
+
 .post-list li {
     margin: 0px;
     padding-top: 30px;
     padding-bottom: 30px;
-    border-bottom: 1px solid #cccccc;
+    border-bottom: 1px solid #ddd;
+}
+.post-list li h3 {
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+.post-list li h3 a {
+    color: black;
+}
+.post-list li h3:hover a {
+    color: #555;
+}
+.post-list li .post-excerpt {
+    margin: 10px 0 8px;
+    line-height: 150%;
+    color: #6a6a6a;
 }
 .post-list .avatar {
-    float: right;
+    // float: right;
     border-radius: 50%;
-    margin-left: 10px;
+    // margin-left: 10px;
 }
 .post .avatar {
     border-radius: 50%;
-    margin-left: 10px;
 }
+
 .post-content h1 {
     font-size: 30px;
     font-weight: 600;
     margin-top: 50px;
-    padding-bottom: 3px;
+    padding-bottom: 5px;
     border-bottom: 1px solid #eaecef;
 }
 .post-content h2 {
     font-size: 26px;
-    font-weight: 400;
+    font-weight: 600;
     margin-top: 50px;
     padding-bottom: 3px;
-    border-bottom: 1px solid #eaecef;
 }
 .post-content h3 {
     font-size: 22px;
     margin-top: 30px;
-    font-weight: 400;
+    font-weight: 500;
 }
+
+.post .read-more {
+    margin-top: 60px;
+    padding-top: 60px;
+    border-top: 1px solid #aaa;
+}
+
+.post .read-more h2 {
+    font-weight: 700;
+    font-size: 25px;
+}
+
+.post .visit-career {
+    margin: 70px 0;
+    text-align: center;
+}
+.post .visit-career a {
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: white;
+    padding: 6px 20px;
+    background-color: black;
+    border-radius: 30px;
+    transition: background-color 0.5s;
+}
+.post .visit-career a:hover {
+    background-color: #444;
+}
+
+.tag-page .post-list {
+    margin: 30px auto;
+    max-width: 700px;
+}
+.tag-page h1 {
+    font-weight: 800;
+    font-size: 25px;
+}
+.tag-page h1 .tag-name {
+    background-color: #eee;
+    padding: 2px 8px;
+    border-radius: 5px;
+}
+
 ul, ol {
     padding-bottom: 10px;
 }
@@ -91,12 +217,14 @@ li {
     margin-bottom: 10px;
 }
 p, li {
-    font-family: 'Spoqa Han Sans', 'Sans-serif';
     word-wrap: break-word;
     font-size: 16px;
     line-height: 30px;
-    color: #444;
-    font-weight: 300;
+    color: #555;
+    font-weight: 400;
+}
+strong {
+    font-weight: 600;
 }
 blockquote > p {
     color: #999;
@@ -128,13 +256,35 @@ pre, code {
     display: flex;
 }
 
+
 .main-content {
-    flex: 4;
+    flex: 1;
 }
 
 .right-panel {
-    flex: 1;
-    margin-left: 10%;
+    flex: 0 0 170px;
+    margin-left: 50px;
+}
+
+.right-panel > h2 {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.site-footer {
+    font-size: 14px;
+    font-weight: 400;
+    color: #666;
+    background-color: #efefef;
+    border-top: none !important;
+}
+.site-footer .rss {
+    float: right;
+    font-size: 12px;
+}
+.site-footer .rss a {
+    color: inherit;
 }
 
 @media (max-width: 768px) {
@@ -143,6 +293,9 @@ pre, code {
     }
     .right-panel {
         margin: 0;
+    }
+    .post-content p {
+        text-align: left;
     }
 }
 

@@ -46,11 +46,11 @@ $ docker run --rm -it -v "$PWD:/srv/jekyll" -p 4000:4000 jekyll/jekyll jekyll se
 1. `_data` 디렉토리의 `authors.yml` 파일에 자신이 사용한 author 이름 및 정보를을 형식에 맞게 추가 합니다. GitHub username을 포함하면 포스트에 GitHub 프로필 사진이 추가되고 GitHub 프로필 페이지로 링크됩니다.
 ```
 dgoon:
-    name: Lee Kangsan
+    name: Kangsan Lee
     username: dgoon
     email: dgoon@hpcnt.com
 hwan:
-    name: Cho Hwan
+    name: Hwan Cho
     username: FrancescoJo
     email: hwan@hpcnt.com
 ```
