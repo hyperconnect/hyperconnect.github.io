@@ -768,9 +768,9 @@ pandas DataFrame은 DataFrame 인스턴스를 생성하는데 필요한 오버�
 
 ML과 관련된 작업을 하다 보면 json을 쓸 일이 아주 많습니다. 추론에 필요한 feature들도 json의 형태로 표현하면 편리하고, 만약 웹서버를 만들 경우 다양한 속성들을 표현하기 위해서 위해서 json으로 데이터를 주고 받는 경우가 많죠. 일반적으로 python에서 json을 다룰 때는 내장 `json` 패키지를 많이 사용합니다. 이 패키지는 Json문자열을 python dict와 list로 seamless하게 바꿔주기 때문에 아주 편리하죠. 
 
-그런데 이 json도 상당한 병목이 될 수 있습니다. Python의 내장 `json` 패키지는 pure python으로 구현되어 있고, 크고 깊은 json 데이터를 다룰 때 예상보다 오랜 시간이 소요될 수 있습니다.
+그런데 이 json도 상당한 병목이 될 수 있습니다. Python의 내장 `json` 패키지는 크고 깊은 json 데이터를 다룰 때 예상보다 오랜 시간이 소요될 수 있습니다.
 
-그렇다면 어떻게 해야 할까요? 다행히 내장 패키지보다 더 빠른 orjson[[7-1]](https://github.com/ijl/orjson)이나 ujson[[7-2]](https://github.com/ultrajson/ultrajson)과 같은 서드파티 패키지들이 있습니다. 이런 라이브러리들은 핵심 로직이 Rust나 C로 구현되어 있고, 큰 사이즈의 데이터를 다루는데 적합하도록 최적화되어 있어 내장 패키지보다 처리 속도가 훨씬 빠릅니다.
+그렇다면 어떻게 해야 할까요? 다행히 내장 패키지보다 더 빠른 orjson[[7-1]](https://github.com/ijl/orjson)이나 ujson[[7-2]](https://github.com/ultrajson/ultrajson)과 같은 서드파티 패키지들이 있습니다. 이런 라이브러리들은 큰 사이즈의 데이터를 다루는데 적합하도록 최적화되어 있어 내장 패키지보다 처리 속도가 훨씬 빠릅니다.
 
 아래 코드는 서로 다른 json 라이브러리에서 1000개의 property를 가지는 json string을 100번 파싱하는 예시입니다.
 
