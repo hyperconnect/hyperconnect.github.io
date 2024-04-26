@@ -2,8 +2,8 @@
 layout: post
 date: 2023-07-25
 title: 1년 동안 Workload의 절반을 ARM64로 Migration하기
-author: sammie 
-tags: arm64 kubernetes graviton aws 
+author: sammie
+tags: arm64 kubernetes graviton aws
 excerpt: AWS에서는 ARM64 기반의 Graviton processor를 지원합니다. 가격도 저렴하고 성능도 좋은 Graviton을 production Kubernetes cluster에 도입하여, 1년 동안 50%의 workload를 전환한 경험을 공유합니다.
 ---
 
@@ -17,7 +17,7 @@ excerpt: AWS에서는 ARM64 기반의 Graviton processor를 지원합니다. 가
 
 
 # ARM64 and Graviton
-본격적으로 migration 과정을 설명하기에 앞서, ARM64와 Graviton processor에 대한 간략한 소개와 migration을 진행한 이유를 설명하겠습니다. ARM64는 cpu archicture의 한 종류로, Intel과 AMD에서 사용하는 ADM64 archicture 대비 전력 소모면에서 강점을 가집니다. 따라서, ARM64는 주로 mobile 환경에서 사용되었으며, 지난 2018년 re:Invent에서 ARM64 기반의 Graviton processor와 2019년 12월 Graviton2 processor를 발표한 이후 서버 시장에서도 유의미한 비중을 차지하게 되었습니다.
+본격적으로 migration 과정을 설명하기에 앞서, ARM64와 Graviton processor에 대한 간략한 소개와 migration을 진행한 이유를 설명하겠습니다. ARM64는 cpu archicture의 한 종류로, Intel과 AMD에서 사용하는 AMD64 archicture 대비 전력 소모면에서 강점을 가집니다. 따라서, ARM64는 주로 mobile 환경에서 사용되었으며, 지난 2018년 re:Invent에서 ARM64 기반의 Graviton processor와 2019년 12월 Graviton2 processor를 발표한 이후 서버 시장에서도 유의미한 비중을 차지하게 되었습니다.
 
 Graviton processor의 장점은 다음과 같습니다.
 - Graviton processor를 사용하는 c6g, m6g, r6g 등의 instance는 Intel 기반 c5, m5, r5보다 20% 저렴합니다.
@@ -174,15 +174,15 @@ Hyperconnect에서는 기본적인 directory 및 non-root 사용자, 내부적�
 Graviton migration을 처음 시작한 2021년 말에는 Docker plugin에 platform argument를 설정하거나, multi-architecture image를 push 할 수 있는 기능이 없어서 다음과 같이 `run_command`를 수동으로 override 하고 tag 뒤에 `-amd64`, `-arm64` 등 postfix를 붙인 다음, 위에서 설명했던 `docker manifest` 기능을 사용하여 1개의 multi-architecture tag를 새로 생성했습니다.
 ```hcl
 {% raw %}
-variable "arch" { 
+variable "arch" {
     type    = string
     default = "amd64"
 }
-source "docker" "base_image_alpine3.15" { 
+source "docker" "base_image_alpine3.15" {
     image       = "docker.hyperconnect.com/proxy/library/alpine:3.15"
     run_command = ["-d", "-i", "-t", "--entrypoint=/bin/sh", "--platform=linux/${var.arch}", "--", "docker.hyperconnect.com/proxy/library/alpine:3.15"]
 }
-build { 
+build {
     name    = "Base Image - Alpine3.15"
     sources = ["source.base_image_alpine3.15"]
     provisioner "shell" {

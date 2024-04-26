@@ -7,7 +7,13 @@
         <span>
         {%- for author_id in post.authors -%}
             {% assign author = site.data.authors[author_id] %}
-            {% avatar user=author.username size={{avatar_size}} %}
+            {%- if author.username -%}
+            <a class="post-author" href="//github.com/{{ author.username }}" target="_blank">
+                {% avatar user=author.username size={{avatar_size}} %}
+            </a>
+            {%- else -%}
+                {% avatar user=author.username size={{avatar_size}} %}
+            {%- endif -%}
         {%- endfor -%}
         </span>
         <span class="author" itemprop="name">
@@ -21,6 +27,10 @@
     <span class="single-author">
         {% assign author = site.data.authors[post.author] %}
         {%- if author.username  -%}
+            <a class="post-author" href="//github.com/{{ author.username }}" target="_blank">
+                {% avatar user=author.username size={{avatar_size}} %}
+            </a>
+        {%- else -%}
             {% avatar user=author.username size={{avatar_size}} %}
         {%- endif -%}
         {%- if include_email -%}
