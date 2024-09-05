@@ -11,6 +11,6 @@
   {% assign article_num = tagitems[0] | to_integer | minus: 10000 %}
 
   {% if article_num > 1 %}
-  <a href="/tag/{{ tagname }}"><span class="tag">{{ tagname }} ({{ article_num }})</span></a>
+  <a href="{{ '/tag/' | relative_url }}{{ tagname | downcase }}.html"><span class="tag">{{ tagname }} ({{ article_num }})</span></a>
   {% endif %}
 {% endfor %}

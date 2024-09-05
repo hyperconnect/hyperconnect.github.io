@@ -16,7 +16,7 @@ layout: base
       <p>
         {% for tag in page.tags %}
           {% capture tag_name %}{{ tag }}{% endcapture %}
-          <a href="/tag/{{ tag_name }}">
+          <a href="{{ '/tag/' | relative_url }}{{ tag_name | downcase }}.html">
             <span class="tag">{{ tag_name }}</span>
           </a>
         {% endfor %}
