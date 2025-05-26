@@ -1,11 +1,11 @@
 ---
 layout: post
-date: 2025-05-21
+date: 2025-05-15
 title: "Building Resilient, High Performance ScyllaDB Clusters with Super Disk"
 author: stewart
 tags: scylladb cassandra kubernetes aws windmill
 excerpt: Hyperconnect가 ScyllaDB의 복구 시간을 20배 단축하고 데이터 안정성을 획기적으로 개선한 Super Disk 구성 전략을 소개합니다. Local NVMe와 EBS의 RAID 구성으로 성능은 유지하면서 장애 복구 시간을 대폭 단축한 기술적 여정과 검증 결과를 공유합니다.
-last_modified_at: 2025-05-21
+last_modified_at: 2025-05-15
 ---
 
 안녕하세요, SRE - Database Platform Unit(DBP)의 stewart입니다.
@@ -48,7 +48,7 @@ ScyllaDB 의 WhitePaper [7 Reasons Not to Put an External Cache in Front of Your
 
 1. **Cassandra의 Cache 접근 방식**
 
-    ![cassandra-cache.png]({{ "/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/cassandra-cache.png" | absolute_url }}){: width="750px" .center-image }
+    ![cassandra-cache.png]({{ "/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/cassandra-cache.png" | absolute_url }}){: width="750px" .center-image }
     - Cassandra는 OS 차원의 Linux page cache와 자체 key cache, row cache 등을 함께 사용합니다.
     - Cassandra의 경우, DB Admin이 각 cache 메모리 크기(JVM heap/off-heap 포함)를 세밀히 조정해야 하며 워크로드가 동적으로 변할 때마다 지속적인 튜닝이 필요합니다.
     - 또한 page cache를 사용할 경우, Linux page cache가 4KB 단위로 동작하기에, 4KB 미만의 데이터가 많은 NoSQL 워크로드에서는 read amplification(읽기 증폭)이 발생할 수 있습니다.
@@ -204,11 +204,11 @@ nvme2n1       3749506449408 disk
 
 <div style="display: flex; flex-direction: column; justify-content: space-between;">
   <div style="flex: 1; text-align: center;">
-    <img src="{{ '/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/i4i-no-raid-performance-benchmark.png' | absolute_url }}" width="750px">
+    <img src="{{ '/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/i4i-no-raid-performance-benchmark.png' | absolute_url }}" width="750px">
     <p><em>RAID를 적용하지 않은 i4i instance의 성능 벤치마크 결과</em></p>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="{{ '/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/i4i-raid-performance-benchmark.png' | absolute_url }}" width="750px">
+    <img src="{{ '/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/i4i-raid-performance-benchmark.png' | absolute_url }}" width="750px">
     <p><em>RAID를 적용한 i4i instance의 성능 벤치마크 결과</em></p>
   </div>
 </div>
@@ -449,14 +449,14 @@ ScyllaDB Super Disk를 적용하기 위해, 총 2가지의 workFlow 를 작성�
 - 초기 Migration workflow
     - 우선 Super Disk를 적용하기 위해서, Super Disk가 적용된 ScyllaDB node 로 데이터를 migration 진행해야 합니다. 이때 새로운 ScyllaDB instance 들을 provisioning 하고, 이를 미리 provisioning 한 EBS 와 RAID 를 수행해야 하는데, 이를 자동화하여 새로운 ScyllaDB instance 에 RAID 를 수행하는 workflow 를 만들었습니다.
         
-        ![windmill-init.png]({{ "/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/windmill-init.png" | absolute_url }}){: width="750px" .center-image }
+        ![windmill-init.png]({{ "/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/windmill-init.png" | absolute_url }}){: width="750px" .center-image }
         
     
 - EBS RAID 기반 ScyllaDB instance 교체 workflow
     - EBS RAID 기반으로 Migration 이 완료되면, 정기적인 AMI 교체나 EKS 버전 업그레이드 시에 기존의 ScyllaDB 교체 방식(data 복사 방식)을 그대로 써서는 안 됩니다.
     - 새 방식에 맞춰 node를 drain하고, RAID를 해제하고, EBS를 다른 instance에 attach하는 과정을 자동화해야 합니다. 따라서 이를 자동화 하는 workflow 를 생성하였습니다.
         
-        ![windmill-scylla-node-replace.png]({{ "/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/windmill-scylla-node-replace.png" | absolute_url }}){: width="750px" .center-image }
+        ![windmill-scylla-node-replace.png]({{ "/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/windmill-scylla-node-replace.png" | absolute_url }}){: width="750px" .center-image }
         
 
 이 과정을 QA/Stage 환경에서 수십 차례 반복 테스트해 발생할 수 있는 예외 상황을 핸들링했고, 오류 발생 시 Flow를 중단 후 재시작 가능하도록 보완했습니다. Windmill은 각 Flow Step 단위로 작업 결과를 UI에 표시하고, 특정 Step만 골라 재실행할 수 있어 디버깅이 매우 편리했습니다.
@@ -475,11 +475,11 @@ script 안정성을 위해, QA와 Stage 환경에서 정해진 횟수 이상 연
 
 <div style="display: flex; flex-direction: column; justify-content: space-between;">
   <div style="flex: 1; text-align: center;">
-    <img src="{{ '/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/scylla-prod-raid.png' | absolute_url }}" width="750px">
+    <img src="{{ '/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/scylla-prod-raid.png' | absolute_url }}" width="750px">
     <p><em>RAID를 적용한 i4i instance의 Production 성능 결과</em></p>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="{{ '/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/scylla-prod-non-raid.png' | absolute_url }}" width="750px">
+    <img src="{{ '/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/scylla-prod-non-raid.png' | absolute_url }}" width="750px">
     <p><em>RAID를 적용하지 않은 i4i instance의 Production 성능 결과</em></p>
   </div>
 </div>
@@ -488,7 +488,7 @@ script 안정성을 위해, QA와 Stage 환경에서 정해진 횟수 이상 연
 
 또한 disk 메트릭을 확인해 보면, **`--write-mostly`** 옵션이 정상 작동해 Local SSD에서만 Read가 발생함을 확인했습니다. 
 
-![write-mostly.png]({{ "/assets/2025-05-21-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/write-mostly.png" | absolute_url }}){: width="750px" .center-image }
+![write-mostly.png]({{ "/assets/2025-05-15-Building-Resilient-High-Performance-ScyllaDB-Clusters-with-Super-Disk/write-mostly.png" | absolute_url }}){: width="750px" .center-image }
 
 # **4.글을 마치며**
 
