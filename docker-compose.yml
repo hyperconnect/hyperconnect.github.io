@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  mount:
+    image: alpine
+    container_name: local-mount
+    volumes:
+      - .:/source:ro
+      - jekyll_data:/target
+    command: >
+      sh -c "cp -a /source/. /target/ && chmod -R 777 /target"
+    restart: "no"
+
+  jekyll:
+    image: jekyll/jekyll:latest
+    container_name: local-jekyll
+    depends_on:
+      - mount
+    ports:
+      - "4000:4000"
+    volumes:
+      - jekyll_data:/srv/jekyll
+    working_dir: /srv/jekyll
+    command: >
+      sh -c "apk add --no-cache build-base libxml2-dev libxslt-dev zlib-dev ruby-dev libffi-dev cmake &&
+            bundle install -j 4 && bundle exec jekyll serve --host 0.0.0.0 --incremental --limit_posts 10 --future"
+volumes:
+  jekyll_data:
