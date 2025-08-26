@@ -1,3 +1,5 @@
+
+
 ---
 layout: post
 date: 2020-07-28
@@ -74,7 +76,7 @@ class HakunaApplication : Application()
 
 Hilt에서 표준적으로 제공하는 Component, 관련 Scope, 생성 및 파괴 시점은 아래와 같습니다.
 
-|         Compoent          |          Scope          |       Created at       |      Destroyed at       |
+|         Component          |          Scope          |       Created at       |      Destroyed at       |
 | :-----------------------: | :---------------------: | :--------------------: | :---------------------: |
 |   ApplicationComponent    |       @Singleton        | Application#onCreate() | Application#onDestroy() |
 | ActivityRetainedComponent | @ActivityRetainedScoped |  Activity#onCreate()   |  Activity#onDestroy()   |
