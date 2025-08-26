@@ -238,6 +238,10 @@ ken.k:
     name: Junhoi Kim
     username: JunhoeKim
     email: ken.k@hpcnt.com
+gom:
+    name: Kyusung Seo
+    username: seo3650
+    email: gom.s@hpcnt.com
 jack:
     name: Gihoon Yeom
     username: ot8844
@@ -254,6 +258,10 @@ zeze:
     name: Jihye Yeom
     username: yeomii
     email: zeze@hpcnt.com
+nein:
+    name: Youngsun Seo
+    username: neinsys
+    email: nein@hpcnt.com
 stewart:
     name: Sanghyo Han
     username: hansh0801
@@ -270,3 +278,7 @@ liam.o:
     name: Jinsang Oh
     username: JamesOhJins
     email: liam.o@hpcnt.com
+jeff.h:
+    name: Jung Hyun Hwang
+    username: jhwang0729
+    email: jeff.h@hpcnt.com
