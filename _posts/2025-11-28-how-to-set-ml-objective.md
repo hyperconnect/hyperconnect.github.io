@@ -1,6 +1,6 @@
 ---
 layout: post
-date: 2025-11-19
+date: 2025-11-28
 title: 왜 막상 배포하면 효과가 없지? 타겟 지표에 맞는 ML모델 train/eval 설계하기
 authors:
     - shawn.s
@@ -8,7 +8,7 @@ authors:
     - juan
 tags:  machine-learning recommender-system
 excerpt: 실제 비즈니스 목표를 최적화하기 위해 머신러닝 모델의 타겟 메트릭을 정하는 방법을 소개합니다.
-last_modified_at: 2025-11-19
+last_modified_at: 2025-11-28
 ---
 
 ML 벤치마크 태스크에서는 타겟 메트릭이 정해져 있고 모델링과 최적화에 집중하는 경우가 많습니다. 하지만 실제 서비스에 ML 모델을 적용할 때는, **무엇을 목표로 삼고** 어떤 지표에 초점을 맞춰야 할지부터 정하는 과정이 매우 중요합니다. 비즈니스 목표가 아닌 잘못된 지표를 최적화 하는 경우, 모델 성능을 계속 높여도 서비스에서 아무런 효과가 발생하지 않는 상황을 겪기도 됩니다.
@@ -44,7 +44,7 @@ ML 벤치마크 태스크에서는 타겟 메트릭이 정해져 있고 모델�
 
 학습 방식을 고안하고 그 방식이 망가지는 상황은 없을지 이론적으로 검토하기 위해, 위 데이터의 주요 column을 서로 종속관계가 있는 확률변수로 다루겠습니다. ’유저가 아이템의 속성을 보고 전환 여부가 결정되는 상황’에서 직접 드러나는 종속관계를 확률 그래프 모델(PGM)로 다음과 같이 표현할 수 있습니다:
 
-![image1]({{ "/assets/2025-11-19-how-to-set-ml-objective/image1.png" | absolute_url }}){: width="80%" .center-image }
+![image1]({{ "/assets/2025-11-28-how-to-set-ml-objective/image1.png" | absolute_url }}){: width="80%" .center-image }
 
 PGM은 변수들 간 조건부 독립 관계를 나타내는 수단이기 때문에, 위 그래프는 우리가 다루는 데이터에 대한 가정을 나타냅니다. 예를 들어 유저와 아이템 둘 다 incoming edge가 없는 것을 통해, 유저와 아이템이 서로 독립이라고 가정했다는 것을 알 수 있습니다.
 
@@ -68,7 +68,7 @@ $$
 
 앞서 한 아이템-유저의 독립성 가정이 보장된다면 위 방식이 말이 되지만, 실제로는 어떤 유저에게 아이템이 완전히 무작위로 보여지는 것이 아니고 추천 알고리즘 등의 비즈니스 로직에 의해 독립성 가정이 깨지게 됩니다. 아이템에 따라 만나는 유저의 분포가 다르다는 것을 PGM에 반영하면 다음과 같습니다:
 
-![image2]({{ "/assets/2025-11-19-how-to-set-ml-objective/image2.png" | absolute_url }}){: width="80%" .center-image }
+![image2]({{ "/assets/2025-11-28-how-to-set-ml-objective/image2.png" | absolute_url }}){: width="80%" .center-image }
 
 이것이 왜 문제가 될 수 있는지 다소 과장된 예시를 들어 보겠습니다. 특정 속성이 어떤 값이냐에 따라 두 가지 유형 A, B로 나눠진다고 하고, 두 가지 user group X, Y가 있다고 해 봅시다. 여기서 각 속성 유형이 각 유저 group에 노출되는 경우 전환 확률이 다음과 같다고 가정합니다:
 
@@ -98,7 +98,7 @@ $$
 
 지금까지의 데이터 모델은 전환이 속성과 유저에 의해 결정되고, 아이템이 직접 전환에 영향을 주지는 않는다고 가정하고 있습니다. 유저가 아이템의 첫인상을 판단할 때 가장 먼저 눈에 들어오는 것은 대표 속성이기 때문에 이는 어느정도 말이 되는 가정이라고도 볼 수 있습니다. 하지만 실제로는 전체적인 속성들과 기타 아이템 정보에도 전환은 작건 크건 영향을 받을 수 밖에 없습니다. 대표 속성 이외의 아이템 프로필이 전환에 영향을 주는 것을 PGM에 반영하면 다음과 같습니다:
 
-![image3]({{ "/assets/2025-11-19-how-to-set-ml-objective/image3.png" | absolute_url }}){: width="80%" .center-image }
+![image3]({{ "/assets/2025-11-28-how-to-set-ml-objective/image3.png" | absolute_url }}){: width="80%" .center-image }
 
 위와 같이 현실적인 요소가 추가되었을 때 유저 기준 상대적인 선호 예측이 실패할 수 있는 케이스를 한가지 떠올려볼 수 있습니다. 아이템 X, Y가 각각 대표 속성으로 속성 유형 A, B를 가지고 있다고 해보겠습니다. 만약 어떤 유저가 아이템 X의 전체적인 설명이 맘에 들어서 전환했고, 아이템 Y의 전체적인 설명이 맘에 들지 않아서 전환하지 않았다고 해보겠습니다. 이 데이터로 학습한 모델은 속성 유형 A가 속성 유형 B보다 유리하다는 판단을 할 것입니다. 하지만 판단에 영향을 준 것은 전체적인 설명이고, 대표 속성의 임팩트는 오히려 반대로 유형 B가 유리했을 수도 있는 것입니다.
 
@@ -129,7 +129,7 @@ $$
 
 추천 로직에 속성을 직접 활용하지 않는 이상 속성과 유저가 서로 인과적으로 영향을 주는 것은 아니기 때문에, 위의 ’시간’과 같이 속성과 유저에 동시에 영향을 주는 hidden variable을 추가하여 유저와 속성간 종속성을 PGM에 반영하겠습니다:
 
-![image4]({{ "/assets/2025-11-19-how-to-set-ml-objective/image4.png" | absolute_url }}){: width="80%" .center-image }
+![image4]({{ "/assets/2025-11-28-how-to-set-ml-objective/image4.png" | absolute_url }}){: width="80%" .center-image }
 
 인과 추론 분야에서는 위와 같은 원리로 문제를 일으키는 hidden variable을 confounder라고 부릅니다. Confounder 역할을 하는 요인들을 알고있다면 고려할 수 있는 분석 방법론들이 있지만, 미처 고려하지 못한 confounder들의 영향까지 한번에 해결할 수 있는 가장 확실한 방법이 있습니다. 효과를 알아내고자 하는 변수값을 직접 랜덤하게 할당하여 결과를 관찰하는 randomized controlled trial(RCT)입니다. 유저 트래픽을 랜덤하게 분산시켜서 결과를 관찰하는 A/B 테스트가 RCT의 가장 대표적인 형태입니다.
 
@@ -137,7 +137,7 @@ $$
 
 우리 상황에서 RCT의 원리를 적용하려면, 어떤 아이템을 유저에게 보여줄 때 그 아이템의 속성 후보들 중에서 대표 속성을 랜덤하게 골라서 보여주면 됩니다. 이렇게 되면 속성은 오로지 아이템에만 의존하게 되고, hidden variable이 confounder로 속성에 영향을 주는 관계를 강제로 끊어낼 수 있습니다. 이 효과를 PGM으로 나타내면 다음과 같습니다:
 
-![image5]({{ "/assets/2025-11-19-how-to-set-ml-objective/image5.png" | absolute_url }}){: width="80%" .center-image }
+![image5]({{ "/assets/2025-11-28-how-to-set-ml-objective/image5.png" | absolute_url }}){: width="80%" .center-image }
 
 운이 좋게도, 이미 위와 같은 방식으로 수집해 둔 ‘attribute shuffle’ 데이터가 소량이지만 존재한다는 것을 알게 되었습니다. 이 데이터는 원래 학습이 아니라 평가에 사용할 예정이었지만, 앞서 살펴본 이유로 인해 이 데이터에서만 얻을 수 있는 시그널이 있기 때문에 데이터셋을 split해서 학습에 활용했습니다. 그리고 실제로 모델을 학습시켰을 때, 이 데이터를 활용해야 앞서 언급된 다른 대안들보다 우리의 오프라인 평가 지표상 가장 좋은 성능을 얻을 수 있다는 것이 확연히 드러났습니다.
 
@@ -192,7 +192,7 @@ $$
 
 전환율의 참값이 0.1인 속성에 대해 랜덤한 100개의 관찰을 통해 계산한 observed CR의 분포를 구하면 다음과 같습니다:
 
-![image6]({{ "/assets/2025-11-19-how-to-set-ml-objective/image6.png" | absolute_url }}){: width="80%" .center-image }
+![image6]({{ "/assets/2025-11-28-how-to-set-ml-objective/image6.png" | absolute_url }}){: width="80%" .center-image }
 
 보시다시피 실제값인 0.1을 중심으로 나타나는 오차 스케일이 0.01보다 훨씬 크다는 것을 확인할 수 있습니다.
 
