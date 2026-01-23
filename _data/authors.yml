@@ -117,7 +117,7 @@ hye:
 mumu:
     name: HyungMo Kim
     username: kalaluthien
-    email: mumu@hpcnt.com
+    email: mumu.kim@match.com
 min.k:
     name: Minkyu Kim
     username: pkgonan
@@ -149,7 +149,7 @@ matt.y:
 owen.l:
     name: Youngsoo Lee
     username: prev
-    email: owen.l@hpcnt.com
+    email: owen.lee@match.com
 jace:
     name: Jisoo Kim
     username: graykick
@@ -294,3 +294,7 @@ link.l:
     name: Seungwoo Lee
     username: ksalsw1996
     email: link.lee@match.com
+joel.ham:
+    name: Joel Ham
+    username: hgs3896
+    email: joel.ham@match.com
